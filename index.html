@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#101827" />
+  <title>Controle de Reposição | Dashboard</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">R</div>
+        <div>
+          <strong>Reposição</strong>
+          <span>Controle inteligente</span>
+        </div>
+      </div>
+      <nav>
+        <button class="nav-item active"><span>▦</span> Visão geral</button>
+        <button class="nav-item" id="scrollTableBtn"><span>≡</span> Semanas</button>
+        <button class="nav-item" id="openSettingsBtn"><span>⚙</span> Conexão</button>
+      </nav>
+      <div class="sidebar-foot">
+        <div class="source-state"><span class="dot" id="sourceDot"></span><div><b id="sourceLabel">Modo demonstração</b><small id="sourceDetail">Dados da planilha enviada</small></div></div>
+      </div>
+    </aside>
+
+    <main>
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">CONTROLE DE ESTOQUE · REPOSIÇÃO</div>
+          <h1>Visão geral</h1>
+          <p>Pedido sugerido x pedido realizado, risco de excesso e trocas.</p>
+        </div>
+        <div class="top-actions">
+          <span class="live-pill"><span class="pulse"></span><span id="liveText">DEMO</span></span>
+          <button class="icon-btn" id="refreshBtn" title="Atualizar agora">↻</button>
+        </div>
+      </header>
+
+      <section class="toolbar">
+        <label><span>Cliente</span><select id="clientFilter"></select></label>
+        <label><span>Produto</span><select id="productFilter"></select></label>
+        <div class="updated"><span>Última atualização</span><strong id="updatedAt">—</strong></div>
+      </section>
+
+      <section class="alert-strip" id="alertStrip">
+        <div class="alert-icon">!</div>
+        <div><strong id="alertTitle">Analisando reposição…</strong><p id="alertText">Os indicadores serão calculados a partir das semanas selecionadas.</p></div>
+        <span class="risk-badge" id="riskBadge">—</span>
+      </section>
+
+      <section class="metrics-grid">
+        <article class="metric"><span>Reposição realizada</span><strong id="mActual">—</strong><small>unidades no período</small></article>
+        <article class="metric"><span>Reposição sugerida</span><strong id="mSuggested">—</strong><small>pela regra da planilha</small></article>
+        <article class="metric"><span>Excesso potencial</span><strong id="mExcess">—</strong><small id="mExcessSub">acima da sugestão</small></article>
+        <article class="metric"><span>Trocas / devoluções</span><strong id="mReturns">—</strong><small id="mReturnsSub">taxa ponderada</small></article>
+        <article class="metric"><span>Semanas acima</span><strong id="mWeeksAbove">—</strong><small>fora da tolerância</small></article>
+        <article class="metric"><span>Estoque final</span><strong id="mFinalStock">—</strong><small>última semana</small></article>
+      </section>
+
+      <section class="grid-main">
+        <article class="panel panel-wide">
+          <div class="panel-head"><div><h2>Pedido realizado x sugestão</h2><p>Veja imediatamente quando o pedido supera a necessidade calculada.</p></div><div class="legend"><span><i class="lg suggested"></i>Sugerido</span><span><i class="lg actual"></i>Realizado</span></div></div>
+          <div class="chart-area" id="comparisonChart" aria-label="Gráfico de comparação de reposição"></div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head"><div><h2>Diagnóstico</h2><p>Leitura rápida do período.</p></div></div>
+          <div class="diagnostic" id="diagnostic"></div>
+        </article>
+
+        <article class="panel panel-wide">
+          <div class="panel-head"><div><h2>Excesso evitável por semana</h2><p>Quantidade acima da sugestão calculada.</p></div></div>
+          <div class="bar-list" id="excessBars"></div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head"><div><h2>Trocas / devoluções</h2><p>Percentual estimado em cada semana.</p></div></div>
+          <div class="return-list" id="returnList"></div>
+        </article>
+      </section>
+
+      <section class="panel table-panel" id="weeklyTableSection">
+        <div class="panel-head"><div><h2>Detalhamento semanal</h2><p>Base operacional para revisar o próximo pedido.</p></div><button class="text-btn" id="exportBtn">Exportar CSV</button></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Semana</th><th>Estoque atual</th><th>Vendas</th><th>Trocas</th><th>Sugestão</th><th>Pedido</th><th>Excesso</th><th>Status</th><th>Risco</th></tr></thead>
+            <tbody id="weeklyTable"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop hidden" id="settingsModal">
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <button class="modal-close" id="closeSettingsBtn">×</button>
+      <div class="eyebrow">CONEXÃO N8N</div>
+      <h2 id="settingsTitle">Fonte de dados em tempo real</h2>
+      <p>Informe a Production URL do webhook que lê a aba <b>API Dashboard</b>. Se deixar vazio, o site continua em modo demonstração.</p>
+      <label class="field"><span>Webhook n8n</span><input id="apiUrlInput" type="url" placeholder="https://seu-n8n.com/webhook/dashboard-reposicao-live" /></label>
+      <label class="field"><span>Chave opcional (header x-dashboard-key)</span><input id="apiKeyInput" type="password" placeholder="Opcional" /></label>
+      <label class="field compact"><span>Atualizar a cada</span><select id="refreshIntervalInput"><option value="15000">15 segundos</option><option value="30000" selected>30 segundos</option><option value="60000">1 minuto</option><option value="120000">2 minutos</option></select></label>
+      <div class="modal-actions"><button class="btn secondary" id="demoModeBtn">Usar demonstração</button><button class="btn primary" id="saveSettingsBtn">Salvar e testar</button></div>
+      <div class="connection-message" id="connectionMessage"></div>
+    </section>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="demo-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
