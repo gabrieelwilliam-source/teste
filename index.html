@@ -2,115 +2,139 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="theme-color" content="#101827" />
-  <title>Controle de Reposição | Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>Painel de Reposição e Perdas</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="shell">
-    <aside class="sidebar">
-      <div class="brand">
-        <div class="brand-mark">R</div>
-        <div>
-          <strong>Reposição</strong>
-          <span>Controle inteligente</span>
-        </div>
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-icon">RP</div>
+      <div><strong>Reposição</strong><span>Controle de perdas</span></div>
+    </div>
+
+    <nav class="nav" aria-label="Navegação principal">
+      <button class="nav-btn active" data-view="overview"><span>▦</span> Visão geral</button>
+      <button class="nav-btn" data-view="clients"><span>◎</span> Clientes</button>
+      <button class="nav-btn" data-view="products"><span>▤</span> Produtos</button>
+      <button class="nav-btn" data-view="alerts"><span>!</span> Alertas</button>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <button class="connection-card" id="openConnectionBtn">
+        <span class="connection-dot" id="connectionDot"></span>
+        <span><b id="connectionTitle">Modo demonstração</b><small id="connectionSub">Conecte o n8n para dados ao vivo</small></span>
+        <span class="chev">›</span>
+      </button>
+    </div>
+  </aside>
+
+  <div class="main-wrap">
+    <header class="topbar">
+      <button class="mobile-menu" id="mobileMenuBtn" aria-label="Abrir menu">☰</button>
+      <div class="topbar-title">
+        <span class="eyebrow">GESTÃO COMERCIAL · ESTOQUE · VALIDADE</span>
+        <h1 id="pageTitle">Visão geral</h1>
       </div>
-      <nav>
-        <button class="nav-item active"><span>▦</span> Visão geral</button>
-        <button class="nav-item" id="scrollTableBtn"><span>≡</span> Semanas</button>
-        <button class="nav-item" id="openSettingsBtn"><span>⚙</span> Conexão</button>
-      </nav>
-      <div class="sidebar-foot">
-        <div class="source-state"><span class="dot" id="sourceDot"></span><div><b id="sourceLabel">Modo demonstração</b><small id="sourceDetail">Dados da planilha enviada</small></div></div>
+      <div class="topbar-actions">
+        <div class="live-badge" id="liveBadge"><span></span><b id="liveText">DEMO</b></div>
+        <button class="icon-btn" id="refreshBtn" title="Atualizar dados">↻</button>
       </div>
-    </aside>
+    </header>
 
-    <main>
-      <header class="topbar">
-        <div>
-          <div class="eyebrow">CONTROLE DE ESTOQUE · REPOSIÇÃO</div>
-          <h1>Visão geral</h1>
-          <p>Pedido sugerido x pedido realizado, risco de excesso e trocas.</p>
+    <main class="content">
+      <section class="filters-card">
+        <div class="filter-group">
+          <label>Cliente<select id="clientFilter"></select></label>
+          <label>Produto<select id="productFilter"></select></label>
+          <label>Status<select id="statusFilter"><option value="__all">Todos</option><option value="ACIMA">Acima da sugestão</option><option value="OK">Dentro do esperado</option><option value="ABAIXO">Abaixo da sugestão</option></select></label>
         </div>
-        <div class="top-actions">
-          <span class="live-pill"><span class="pulse"></span><span id="liveText">DEMO</span></span>
-          <button class="icon-btn" id="refreshBtn" title="Atualizar agora">↻</button>
-        </div>
-      </header>
-
-      <section class="toolbar">
-        <label><span>Cliente</span><select id="clientFilter"></select></label>
-        <label><span>Produto</span><select id="productFilter"></select></label>
-        <div class="updated"><span>Última atualização</span><strong id="updatedAt">—</strong></div>
+        <div class="update-box"><span>Última atualização</span><strong id="updatedAt">—</strong></div>
       </section>
 
-      <section class="alert-strip" id="alertStrip">
-        <div class="alert-icon">!</div>
-        <div><strong id="alertTitle">Analisando reposição…</strong><p id="alertText">Os indicadores serão calculados a partir das semanas selecionadas.</p></div>
-        <span class="risk-badge" id="riskBadge">—</span>
+      <section class="view active" id="view-overview">
+        <section class="hero-alert" id="heroAlert">
+          <div class="hero-alert-icon">!</div>
+          <div><span class="mini-label">DIAGNÓSTICO AUTOMÁTICO</span><h2 id="heroAlertTitle">Analisando os dados...</h2><p id="heroAlertText">O painel vai comparar o pedido realizado com a sugestão calculada.</p></div>
+          <span class="risk-pill" id="heroRisk">—</span>
+        </section>
+
+        <section class="kpi-grid">
+          <article class="kpi-card primary"><div class="kpi-label">Reposição realizada</div><div class="kpi-value" id="kpiActual">—</div><div class="kpi-foot">unidades no período</div></article>
+          <article class="kpi-card"><div class="kpi-label">Reposição sugerida</div><div class="kpi-value" id="kpiSuggested">—</div><div class="kpi-foot">pela regra de estoque</div></article>
+          <article class="kpi-card danger"><div class="kpi-label">Excesso potencial</div><div class="kpi-value" id="kpiExcess">—</div><div class="kpi-foot" id="kpiExcessFoot">acima da sugestão</div></article>
+          <article class="kpi-card"><div class="kpi-label">Trocas / devoluções</div><div class="kpi-value" id="kpiReturns">—</div><div class="kpi-foot" id="kpiReturnsFoot">taxa no período</div></article>
+          <article class="kpi-card"><div class="kpi-label">Semanas acima</div><div class="kpi-value" id="kpiWeeksAbove">—</div><div class="kpi-foot">com excesso de pedido</div></article>
+          <article class="kpi-card"><div class="kpi-label">Estoque final</div><div class="kpi-value" id="kpiFinalStock">—</div><div class="kpi-foot">última semana disponível</div></article>
+        </section>
+
+        <section class="dashboard-grid">
+          <article class="panel panel-span-2">
+            <div class="panel-head"><div><span class="mini-label">COMPARAÇÃO SEMANAL</span><h3>Pedido realizado x pedido sugerido</h3><p>Quanto maior a distância, maior a chance de sobre-estoque e perda por validade.</p></div><div class="legend"><span><i class="suggested"></i>Sugerido</span><span><i class="actual"></i>Realizado</span></div></div>
+            <div id="comparisonChart" class="comparison-chart"></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-head"><div><span class="mini-label">RECOMENDAÇÃO</span><h3>Próximo pedido</h3></div></div>
+            <div id="nextOrderCard" class="next-order"></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-head"><div><span class="mini-label">OPORTUNIDADE</span><h3>Excesso evitável</h3></div></div>
+            <div id="excessSummary" class="excess-summary"></div>
+          </article>
+
+          <article class="panel panel-span-2">
+            <div class="panel-head"><div><span class="mini-label">HISTÓRICO</span><h3>Detalhamento semanal</h3><p>Clique em uma linha para ver o diagnóstico daquela semana.</p></div><button class="ghost-btn" id="exportBtn">Exportar CSV</button></div>
+            <div class="table-wrap"><table><thead><tr><th>Semana</th><th>Estoque inicial</th><th>Vendas</th><th>Trocas</th><th>Sugestão</th><th>Pedido</th><th>Excesso</th><th>Status</th><th>Risco</th></tr></thead><tbody id="weeklyTable"></tbody></table></div>
+          </article>
+        </section>
       </section>
 
-      <section class="metrics-grid">
-        <article class="metric"><span>Reposição realizada</span><strong id="mActual">—</strong><small>unidades no período</small></article>
-        <article class="metric"><span>Reposição sugerida</span><strong id="mSuggested">—</strong><small>pela regra da planilha</small></article>
-        <article class="metric"><span>Excesso potencial</span><strong id="mExcess">—</strong><small id="mExcessSub">acima da sugestão</small></article>
-        <article class="metric"><span>Trocas / devoluções</span><strong id="mReturns">—</strong><small id="mReturnsSub">taxa ponderada</small></article>
-        <article class="metric"><span>Semanas acima</span><strong id="mWeeksAbove">—</strong><small>fora da tolerância</small></article>
-        <article class="metric"><span>Estoque final</span><strong id="mFinalStock">—</strong><small>última semana</small></article>
+      <section class="view" id="view-clients">
+        <section class="section-intro"><div><span class="eyebrow">VISÃO POR CLIENTE</span><h2>Onde está concentrado o excesso?</h2><p>Ranking dos clientes com maior diferença entre o pedido feito e o pedido recomendado.</p></div></section>
+        <section class="panel"><div class="toolbar-inline"><input id="clientSearch" type="search" placeholder="Buscar cliente..."/><select id="clientSort"><option value="excess">Maior excesso</option><option value="returns">Maior troca</option><option value="actual">Maior reposição</option></select></div><div id="clientsList" class="entity-list"></div></section>
       </section>
 
-      <section class="grid-main">
-        <article class="panel panel-wide">
-          <div class="panel-head"><div><h2>Pedido realizado x sugestão</h2><p>Veja imediatamente quando o pedido supera a necessidade calculada.</p></div><div class="legend"><span><i class="lg suggested"></i>Sugerido</span><span><i class="lg actual"></i>Realizado</span></div></div>
-          <div class="chart-area" id="comparisonChart" aria-label="Gráfico de comparação de reposição"></div>
-        </article>
-
-        <article class="panel">
-          <div class="panel-head"><div><h2>Diagnóstico</h2><p>Leitura rápida do período.</p></div></div>
-          <div class="diagnostic" id="diagnostic"></div>
-        </article>
-
-        <article class="panel panel-wide">
-          <div class="panel-head"><div><h2>Excesso evitável por semana</h2><p>Quantidade acima da sugestão calculada.</p></div></div>
-          <div class="bar-list" id="excessBars"></div>
-        </article>
-
-        <article class="panel">
-          <div class="panel-head"><div><h2>Trocas / devoluções</h2><p>Percentual estimado em cada semana.</p></div></div>
-          <div class="return-list" id="returnList"></div>
-        </article>
+      <section class="view" id="view-products">
+        <section class="section-intro"><div><span class="eyebrow">VISÃO POR PRODUTO</span><h2>Quais produtos merecem atenção?</h2><p>Compare reposição, excesso e devoluções por produto.</p></div></section>
+        <section class="panel"><div class="toolbar-inline"><input id="productSearch" type="search" placeholder="Buscar produto..."/><select id="productSort"><option value="excess">Maior excesso</option><option value="returns">Maior troca</option><option value="actual">Maior reposição</option></select></div><div id="productsList" class="entity-list"></div></section>
       </section>
 
-      <section class="panel table-panel" id="weeklyTableSection">
-        <div class="panel-head"><div><h2>Detalhamento semanal</h2><p>Base operacional para revisar o próximo pedido.</p></div><button class="text-btn" id="exportBtn">Exportar CSV</button></div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Semana</th><th>Estoque atual</th><th>Vendas</th><th>Trocas</th><th>Sugestão</th><th>Pedido</th><th>Excesso</th><th>Status</th><th>Risco</th></tr></thead>
-            <tbody id="weeklyTable"></tbody>
-          </table>
-        </div>
+      <section class="view" id="view-alerts">
+        <section class="section-intro"><div><span class="eyebrow">CENTRAL DE ALERTAS</span><h2>O que precisa de ação agora?</h2><p>Semanas com excesso, taxa de troca elevada ou pedido abaixo do recomendado.</p></div><div class="alert-count"><span>Alertas ativos</span><strong id="activeAlertsCount">0</strong></div></section>
+        <section id="alertsList" class="alerts-list"></section>
       </section>
     </main>
   </div>
+</div>
 
-  <div class="modal-backdrop hidden" id="settingsModal">
-    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
-      <button class="modal-close" id="closeSettingsBtn">×</button>
-      <div class="eyebrow">CONEXÃO N8N</div>
-      <h2 id="settingsTitle">Fonte de dados em tempo real</h2>
-      <p>Informe a Production URL do webhook que lê a aba <b>API Dashboard</b>. Se deixar vazio, o site continua em modo demonstração.</p>
-      <label class="field"><span>Webhook n8n</span><input id="apiUrlInput" type="url" placeholder="https://seu-n8n.com/webhook/dashboard-reposicao-live" /></label>
-      <label class="field"><span>Chave opcional (header x-dashboard-key)</span><input id="apiKeyInput" type="password" placeholder="Opcional" /></label>
-      <label class="field compact"><span>Atualizar a cada</span><select id="refreshIntervalInput"><option value="15000">15 segundos</option><option value="30000" selected>30 segundos</option><option value="60000">1 minuto</option><option value="120000">2 minutos</option></select></label>
-      <div class="modal-actions"><button class="btn secondary" id="demoModeBtn">Usar demonstração</button><button class="btn primary" id="saveSettingsBtn">Salvar e testar</button></div>
-      <div class="connection-message" id="connectionMessage"></div>
-    </section>
-  </div>
+<div class="modal-backdrop hidden" id="connectionModal">
+  <section class="modal" role="dialog" aria-modal="true" aria-labelledby="connectionModalTitle">
+    <button class="modal-close" id="closeConnectionBtn" aria-label="Fechar">×</button>
+    <span class="eyebrow">CONEXÃO DE DADOS</span>
+    <h2 id="connectionModalTitle">Conectar o painel ao n8n</h2>
+    <p>O site consulta uma URL do webhook. O n8n lê a aba <b>API Dashboard</b> do Google Sheets e devolve JSON.</p>
+    <label class="field">Production URL do webhook<input id="apiUrlInput" type="url" placeholder="https://seu-n8n.com/webhook/dashboard-reposicao-live" /></label>
+    <label class="field">Chave opcional<input id="apiKeyInput" type="password" placeholder="Header x-dashboard-key (opcional)" /></label>
+    <label class="field">Atualização automática<select id="refreshIntervalInput"><option value="15000">A cada 15 segundos</option><option value="30000">A cada 30 segundos</option><option value="60000">A cada 1 minuto</option><option value="120000">A cada 2 minutos</option></select></label>
+    <div class="connection-preview"><span id="connectionPreviewDot"></span><div><b id="connectionPreviewTitle">Ainda não conectado</b><small id="connectionPreviewText">Cole a URL e clique em Salvar e testar.</small></div></div>
+    <div class="modal-actions"><button class="secondary-btn" id="demoModeBtn">Usar demonstração</button><button class="primary-btn" id="saveConnectionBtn">Salvar e testar</button></div>
+  </section>
+</div>
 
-  <div class="toast" id="toast"></div>
-  <script src="demo-data.js"></script>
-  <script src="app.js"></script>
+<div class="drawer-backdrop hidden" id="detailDrawerBackdrop"></div>
+<aside class="detail-drawer" id="detailDrawer" aria-hidden="true">
+  <button class="drawer-close" id="closeDrawerBtn">×</button>
+  <span class="eyebrow">DETALHE DA SEMANA</span>
+  <h2 id="drawerTitle">—</h2>
+  <div id="drawerContent"></div>
+</aside>
+
+<div class="toast" id="toast" role="status"></div>
+<script src="demo-data.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
