@@ -1,140 +1,105 @@
+<!-- Reposicao Inteligente V4.1 - Dashboard Gestor -->
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#0f172a" />
-  <title>Painel de Reposição e Perdas</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0b1739">
+  <title>Gestão de Reposição</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<div class="app-shell">
-  <aside class="sidebar" id="sidebar">
-    <div class="brand">
-      <div class="brand-icon">RP</div>
-      <div><strong>Reposição</strong><span>Controle de perdas</span></div>
-    </div>
-
-    <nav class="nav" aria-label="Navegação principal">
-      <button class="nav-btn active" data-view="overview"><span>▦</span> Visão geral</button>
-      <button class="nav-btn" data-view="clients"><span>◎</span> Clientes</button>
-      <button class="nav-btn" data-view="products"><span>▤</span> Produtos</button>
-      <button class="nav-btn" data-view="alerts"><span>!</span> Alertas</button>
-    </nav>
-
-    <div class="sidebar-bottom">
-      <button class="connection-card" id="openConnectionBtn">
-        <span class="connection-dot" id="connectionDot"></span>
-        <span><b id="connectionTitle">Modo demonstração</b><small id="connectionSub">Conecte o n8n para dados ao vivo</small></span>
-        <span class="chev">›</span>
-      </button>
-    </div>
-  </aside>
-
-  <div class="main-wrap">
-    <header class="topbar">
-      <button class="mobile-menu" id="mobileMenuBtn" aria-label="Abrir menu">☰</button>
-      <div class="topbar-title">
-        <span class="eyebrow">GESTÃO COMERCIAL · ESTOQUE · VALIDADE</span>
-        <h1 id="pageTitle">Visão geral</h1>
+  <div class="layout">
+    <aside id="sidebar" class="sidebar">
+      <div class="logo"><div class="logo-mark">RI</div><div><strong>Reposição</strong><span>Gestão inteligente</span></div></div>
+      <nav>
+        <button class="nav active" data-view="overview"><span>▦</span>Visão geral</button>
+        <button class="nav" data-view="sellers"><span>◎</span>Vendedores</button>
+        <button class="nav" data-view="stores"><span>□</span>Lojas</button>
+        <button class="nav" data-view="products"><span>▤</span>Produtos</button>
+        <button class="nav" data-view="history"><span>↺</span>Histórico</button>
+        <button class="nav" data-view="alerts"><span>!</span>Alertas <b id="alertBadge">0</b></button>
+      </nav>
+      <div class="sidebar-bottom">
+        <button id="connectionBtn" class="connection"><span id="connectionDot"></span><div><strong id="connectionTitle">Modo demonstração</strong><small id="connectionSub">Conecte o n8n para dados ao vivo</small></div></button>
       </div>
-      <div class="topbar-actions">
-        <div class="live-badge" id="liveBadge"><span></span><b id="liveText">DEMO</b></div>
-        <button class="icon-btn" id="refreshBtn" title="Atualizar dados">↻</button>
-      </div>
-    </header>
+    </aside>
 
-    <main class="content">
-      <section class="filters-card">
-        <div class="filter-group">
-          <label>Cliente<select id="clientFilter"></select></label>
-          <label>Produto<select id="productFilter"></select></label>
-          <label>Status<select id="statusFilter"><option value="__all">Todos</option><option value="ACIMA">Acima da sugestão</option><option value="OK">Dentro do esperado</option><option value="ABAIXO">Abaixo da sugestão</option></select></label>
+    <main class="main">
+      <header class="topbar">
+        <button id="menuBtn" class="menu-btn">☰</button>
+        <div><span class="eyebrow">GESTÃO COMERCIAL · ESTOQUE · VALIDADE</span><h1 id="pageTitle">Visão geral</h1></div>
+        <div class="top-actions"><span id="liveBadge" class="live-badge"><i></i><span>DEMO</span></span><button id="refreshBtn" class="square-btn">↻</button></div>
+      </header>
+
+      <section class="content">
+        <div class="filterbar">
+          <label>Período<select id="periodFilter"><option value="7">Últimos 7 dias</option><option value="30" selected>Últimos 30 dias</option><option value="90">Últimos 90 dias</option><option value="all">Todo o histórico</option></select></label>
+          <label>Vendedor<select id="sellerFilter"><option value="">Todos</option></select></label>
+          <label>Loja<select id="storeFilter"><option value="">Todas</option></select></label>
+          <label>Produto<select id="productFilter"><option value="">Todos</option></select></label>
+          <div class="updated"><span>Última atualização</span><strong id="updatedAt">—</strong></div>
         </div>
-        <div class="update-box"><span>Última atualização</span><strong id="updatedAt">—</strong></div>
-      </section>
 
-      <section class="view active" id="view-overview">
-        <section class="hero-alert" id="heroAlert">
-          <div class="hero-alert-icon">!</div>
-          <div><span class="mini-label">DIAGNÓSTICO AUTOMÁTICO</span><h2 id="heroAlertTitle">Analisando os dados...</h2><p id="heroAlertText">O painel vai comparar o pedido realizado com a sugestão calculada.</p></div>
-          <span class="risk-pill" id="heroRisk">—</span>
+        <section id="view-overview" class="view active">
+          <div id="executiveAlert" class="executive-alert"></div>
+          <div class="kpi-grid">
+            <article class="kpi accent"><span>Pedidos confirmados</span><strong id="kpiOrders">0</strong><small>unidades no período</small></article>
+            <article class="kpi"><span>Sugestão do sistema</span><strong id="kpiSuggested">0</strong><small>referência calculada</small></article>
+            <article class="kpi danger"><span>Excesso potencial</span><strong id="kpiExcess">0</strong><small id="kpiExcessPct">0% do pedido</small></article>
+            <article class="kpi"><span>Vendas estimadas</span><strong id="kpiSales">0</strong><small>entre visitas</small></article>
+            <article class="kpi"><span>Aderência à sugestão</span><strong id="kpiAdherence">0%</strong><small>média dos pedidos</small></article>
+            <article class="kpi"><span>Lojas visitadas</span><strong id="kpiVisits">0</strong><small id="kpiVisitsSub">de 20 lojas</small></article>
+          </div>
+
+          <div class="grid-2">
+            <article class="panel chart-panel"><div class="panel-head"><div><span class="section-label">COMPARATIVO</span><h2>Sugerido x confirmado por vendedor</h2></div><div class="legend"><i class="suggested"></i>Sugerido<i class="confirmed"></i>Confirmado</div></div><canvas id="sellerChart" height="330"></canvas></article>
+            <article class="panel"><div class="panel-head"><div><span class="section-label">EFICIÊNCIA</span><h2>Indicadores de controle</h2></div></div><div id="efficiencyCards" class="efficiency-list"></div></article>
+          </div>
+
+          <div class="grid-2 lower">
+            <article class="panel"><div class="panel-head"><div><span class="section-label">TENDÊNCIA</span><h2>Pedidos ao longo do período</h2></div></div><canvas id="trendChart" height="290"></canvas></article>
+            <article class="panel"><div class="panel-head"><div><span class="section-label">ATENÇÃO</span><h2>Maiores excessos potenciais</h2></div><button class="link-btn" data-go="alerts">Ver alertas</button></div><div id="topRisks" class="risk-list"></div></article>
+          </div>
+
+          <article class="panel table-panel"><div class="panel-head"><div><span class="section-label">OPERAÇÃO</span><h2>Últimas visitas registradas</h2></div><button id="exportOverview" class="outline-btn">Exportar CSV</button></div><div class="table-wrap"><table><thead><tr><th>Data</th><th>Vendedor</th><th>Loja</th><th>Sugerido</th><th>Pedido</th><th>Diferença</th><th>Aderência</th><th>Status</th></tr></thead><tbody id="latestVisits"></tbody></table></div></article>
         </section>
 
-        <section class="kpi-grid">
-          <article class="kpi-card primary"><div class="kpi-label">Reposição realizada</div><div class="kpi-value" id="kpiActual">—</div><div class="kpi-foot">unidades no período</div></article>
-          <article class="kpi-card"><div class="kpi-label">Reposição sugerida</div><div class="kpi-value" id="kpiSuggested">—</div><div class="kpi-foot">pela regra de estoque</div></article>
-          <article class="kpi-card danger"><div class="kpi-label">Excesso potencial</div><div class="kpi-value" id="kpiExcess">—</div><div class="kpi-foot" id="kpiExcessFoot">acima da sugestão</div></article>
-          <article class="kpi-card"><div class="kpi-label">Trocas / devoluções</div><div class="kpi-value" id="kpiReturns">—</div><div class="kpi-foot" id="kpiReturnsFoot">taxa no período</div></article>
-          <article class="kpi-card"><div class="kpi-label">Semanas acima</div><div class="kpi-value" id="kpiWeeksAbove">—</div><div class="kpi-foot">com excesso de pedido</div></article>
-          <article class="kpi-card"><div class="kpi-label">Estoque final</div><div class="kpi-value" id="kpiFinalStock">—</div><div class="kpi-foot">última semana disponível</div></article>
+        <section id="view-sellers" class="view">
+          <div class="section-intro"><div><span class="section-label">EQUIPE COMERCIAL</span><h2>Desempenho por vendedor</h2><p>Compare volume, aderência à recomendação, excesso potencial e cobertura das lojas.</p></div></div>
+          <div id="sellerCards" class="seller-cards"></div>
+          <article class="panel table-panel"><div class="panel-head"><div><span class="section-label">RANKING</span><h2>Comparativo completo</h2></div></div><div class="table-wrap"><table><thead><tr><th>Vendedor</th><th>Lojas</th><th>Visitas</th><th>Sugerido</th><th>Confirmado</th><th>Excesso</th><th>Aderência</th><th>Trocas</th></tr></thead><tbody id="sellerTable"></tbody></table></div></article>
         </section>
 
-        <section class="dashboard-grid">
-          <article class="panel panel-span-2">
-            <div class="panel-head"><div><span class="mini-label">COMPARAÇÃO SEMANAL</span><h3>Pedido realizado x pedido sugerido</h3><p>Quanto maior a distância, maior a chance de sobre-estoque e perda por validade.</p></div><div class="legend"><span><i class="suggested"></i>Sugerido</span><span><i class="actual"></i>Realizado</span></div></div>
-            <div id="comparisonChart" class="comparison-chart"></div>
-          </article>
-
-          <article class="panel">
-            <div class="panel-head"><div><span class="mini-label">RECOMENDAÇÃO</span><h3>Próximo pedido</h3></div></div>
-            <div id="nextOrderCard" class="next-order"></div>
-          </article>
-
-          <article class="panel">
-            <div class="panel-head"><div><span class="mini-label">OPORTUNIDADE</span><h3>Excesso evitável</h3></div></div>
-            <div id="excessSummary" class="excess-summary"></div>
-          </article>
-
-          <article class="panel panel-span-2">
-            <div class="panel-head"><div><span class="mini-label">HISTÓRICO</span><h3>Detalhamento semanal</h3><p>Clique em uma linha para ver o diagnóstico daquela semana.</p></div><button class="ghost-btn" id="exportBtn">Exportar CSV</button></div>
-            <div class="table-wrap"><table><thead><tr><th>Semana</th><th>Estoque inicial</th><th>Vendas</th><th>Trocas</th><th>Sugestão</th><th>Pedido</th><th>Excesso</th><th>Status</th><th>Risco</th></tr></thead><tbody id="weeklyTable"></tbody></table></div>
-          </article>
+        <section id="view-stores" class="view">
+          <div class="section-intro"><div><span class="section-label">CARTEIRA</span><h2>Acompanhamento das lojas</h2><p>Veja onde a recomendação está sendo respeitada e onde há maior risco de sobre-estoque.</p></div></div>
+          <div id="storeGrid" class="entity-grid"></div>
         </section>
-      </section>
 
-      <section class="view" id="view-clients">
-        <section class="section-intro"><div><span class="eyebrow">VISÃO POR CLIENTE</span><h2>Onde está concentrado o excesso?</h2><p>Ranking dos clientes com maior diferença entre o pedido feito e o pedido recomendado.</p></div></section>
-        <section class="panel"><div class="toolbar-inline"><input id="clientSearch" type="search" placeholder="Buscar cliente..."/><select id="clientSort"><option value="excess">Maior excesso</option><option value="returns">Maior troca</option><option value="actual">Maior reposição</option></select></div><div id="clientsList" class="entity-list"></div></section>
-      </section>
+        <section id="view-products" class="view">
+          <div class="section-intro"><div><span class="section-label">PORTFÓLIO</span><h2>Análise por produto</h2><p>Identifique produtos com maior volume, excesso, giro estimado e devoluções.</p></div></div>
+          <div id="productGrid" class="entity-grid"></div>
+        </section>
 
-      <section class="view" id="view-products">
-        <section class="section-intro"><div><span class="eyebrow">VISÃO POR PRODUTO</span><h2>Quais produtos merecem atenção?</h2><p>Compare reposição, excesso e devoluções por produto.</p></div></section>
-        <section class="panel"><div class="toolbar-inline"><input id="productSearch" type="search" placeholder="Buscar produto..."/><select id="productSort"><option value="excess">Maior excesso</option><option value="returns">Maior troca</option><option value="actual">Maior reposição</option></select></div><div id="productsList" class="entity-list"></div></section>
-      </section>
+        <section id="view-history" class="view">
+          <div class="section-intro history-head"><div><span class="section-label">AUDITORIA</span><h2>Histórico operacional</h2><p>Cada confirmação deixa um registro rastreável por vendedor, loja e produto.</p></div><button id="exportHistory" class="outline-btn">Exportar CSV</button></div>
+          <article class="panel table-panel"><div class="table-wrap history-table"><table><thead><tr><th>Data</th><th>Vendedor</th><th>Loja</th><th>Produto</th><th>Estoque</th><th>Venda est.</th><th>Sugestão</th><th>Pedido</th><th>Dif.</th><th>Aderência</th><th>Trocas</th></tr></thead><tbody id="historyTable"></tbody></table></div></article>
+        </section>
 
-      <section class="view" id="view-alerts">
-        <section class="section-intro"><div><span class="eyebrow">CENTRAL DE ALERTAS</span><h2>O que precisa de ação agora?</h2><p>Semanas com excesso, taxa de troca elevada ou pedido abaixo do recomendado.</p></div><div class="alert-count"><span>Alertas ativos</span><strong id="activeAlertsCount">0</strong></div></section>
-        <section id="alertsList" class="alerts-list"></section>
+        <section id="view-alerts" class="view">
+          <div class="section-intro"><div><span class="section-label">CENTRAL DE EXCEÇÕES</span><h2>Alertas que merecem revisão</h2><p>O sistema prioriza pedidos muito acima da recomendação, baixa aderência e devoluções relevantes.</p></div></div>
+          <div id="alertsList" class="alerts-list"></div>
+        </section>
       </section>
     </main>
   </div>
-</div>
 
-<div class="modal-backdrop hidden" id="connectionModal">
-  <section class="modal" role="dialog" aria-modal="true" aria-labelledby="connectionModalTitle">
-    <button class="modal-close" id="closeConnectionBtn" aria-label="Fechar">×</button>
-    <span class="eyebrow">CONEXÃO DE DADOS</span>
-    <h2 id="connectionModalTitle">Conectar o painel ao n8n</h2>
-    <p>O site consulta uma URL do webhook. O n8n lê a aba <b>API Dashboard</b> do Google Sheets e devolve JSON.</p>
-    <label class="field">Production URL do webhook<input id="apiUrlInput" type="url" placeholder="https://seu-n8n.com/webhook/dashboard-reposicao-live" /></label>
-    <label class="field">Chave opcional<input id="apiKeyInput" type="password" placeholder="Header x-dashboard-key (opcional)" /></label>
-    <label class="field">Atualização automática<select id="refreshIntervalInput"><option value="15000">A cada 15 segundos</option><option value="30000">A cada 30 segundos</option><option value="60000">A cada 1 minuto</option><option value="120000">A cada 2 minutos</option></select></label>
-    <div class="connection-preview"><span id="connectionPreviewDot"></span><div><b id="connectionPreviewTitle">Ainda não conectado</b><small id="connectionPreviewText">Cole a URL e clique em Salvar e testar.</small></div></div>
-    <div class="modal-actions"><button class="secondary-btn" id="demoModeBtn">Usar demonstração</button><button class="primary-btn" id="saveConnectionBtn">Salvar e testar</button></div>
-  </section>
-</div>
+  <div id="drawerBackdrop" class="drawer-backdrop hidden"></div>
+  <aside id="drawer" class="drawer" aria-hidden="true"><button id="drawerClose" class="drawer-close">×</button><span class="section-label" id="drawerLabel">DETALHES</span><h2 id="drawerTitle">—</h2><div id="drawerBody"></div></aside>
 
-<div class="drawer-backdrop hidden" id="detailDrawerBackdrop"></div>
-<aside class="detail-drawer" id="detailDrawer" aria-hidden="true">
-  <button class="drawer-close" id="closeDrawerBtn">×</button>
-  <span class="eyebrow">DETALHE DA SEMANA</span>
-  <h2 id="drawerTitle">—</h2>
-  <div id="drawerContent"></div>
-</aside>
-
-<div class="toast" id="toast" role="status"></div>
-<script src="demo-data.js"></script>
-<script src="app.js"></script>
+  <div id="connectionModal" class="modal hidden"><div class="modal-card"><span class="section-label">CONEXÃO</span><h2>Conectar dashboard ao n8n</h2><p>Use a Production URL do webhook <b>reposicao-gestor</b> e a chave configurada na planilha.</p><label>URL do gestor<input id="managerUrl" type="url" placeholder="https://seu-n8n/webhook/reposicao-gestor"></label><label>Chave do gestor<input id="managerKey" type="password" placeholder="GESTOR2026"></label><div id="connectionMessage" class="connection-message"></div><div class="modal-actions"><button id="useDemo" class="outline-btn">Usar demonstração</button><button id="closeModal" class="outline-btn">Cancelar</button><button id="saveConnection" class="primary-btn">Salvar e testar</button></div></div></div>
+  <div id="toast" class="toast"></div>
+  <script src="demo-data.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
