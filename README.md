@@ -8,3 +8,6 @@
 - Compatível com o workflow REPOSICAO_INTELIGENTE_V4.4_ESTAVEL_REALTIME.json.
 
 Use a Production URL `/webhook/reposicao-gestor` e a chave definida em `API Config`.
+
+
+V4.5: corrige datas seriais do Google Sheets, filtros por período, reset de filtros ao conectar e mantém atualização automática a cada 30s.
