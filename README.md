@@ -1,9 +1,10 @@
-# Dashboard do Gestor V4.1
+# Dashboard Gestor V4.4 — Realtime
 
-Compatível com `N8N_REPOSICAO_INTELIGENTE_V4.1_CORRIGIDO.json`.
+- Atualização automática a cada 30 segundos.
+- Atualiza imediatamente ao voltar para a aba se os dados estiverem defasados.
+- Impede requisições simultâneas.
+- Mantém os últimos dados válidos quando houver falha temporária.
+- Trata resposta vazia/não-JSON do n8n sem expor erro técnico ao usuário.
+- Compatível com o workflow REPOSICAO_INTELIGENTE_V4.4_ESTAVEL_REALTIME.json.
 
-Visões: geral, vendedores, lojas, produtos, histórico e alertas.
-
-Na conexão informe:
-- URL: `https://SEU-N8N/webhook/reposicao-gestor`
-- Chave: valor da aba `API Config` da planilha.
+Use a Production URL `/webhook/reposicao-gestor` e a chave definida em `API Config`.

@@ -3,18 +3,22 @@
   const els={period:$('#periodFilter'),seller:$('#sellerFilter'),store:$('#storeFilter'),product:$('#productFilter'),updated:$('#updatedAt'),live:$('#liveBadge'),connDot:$('#connectionDot'),connTitle:$('#connectionTitle'),connSub:$('#connectionSub'),alertBadge:$('#alertBadge'),drawer:$('#drawer'),drawerBack:$('#drawerBackdrop'),drawerTitle:$('#drawerTitle'),drawerLabel:$('#drawerLabel'),drawerBody:$('#drawerBody'),modal:$('#connectionModal'),managerUrl:$('#managerUrl'),managerKey:$('#managerKey'),connMsg:$('#connectionMessage')};
   const DEMO=window.REPOSICAO_DEMO_DATA||{state:[],history:[],sellers:[]};
   let data={state:DEMO.state||[],history:DEMO.history||[],sellers:DEMO.sellers||[],updatedAt:DEMO.generatedAt||new Date().toISOString(),demo:true};
-  const clean=v=>String(v??'').trim(), n=v=>Number(String(v??0).replace(',','.'))||0, fmt=v=>new Intl.NumberFormat('pt-BR',{maximumFractionDigits:0}).format(Math.round(n(v))), pct=v=>new Intl.NumberFormat('pt-BR',{style:'percent',maximumFractionDigits:1}).format(n(v));
+  const clean=v=>String(v??'').trim();
+  const n=v=>{if(typeof v==='number')return Number.isFinite(v)?v:0;let s=String(v??'').trim();if(!s)return 0;const isPct=s.endsWith('%');if(isPct)s=s.slice(0,-1).trim();if(s.includes(',')&&s.includes('.')){if(s.lastIndexOf(',')>s.lastIndexOf('.'))s=s.replace(/\./g,'').replace(',','.');else s=s.replace(/,/g,'')}else if(s.includes(',')){s=s.replace(/\./g,'').replace(',','.')}s=s.replace(/[^0-9.\-]/g,'');const x=Number(s);return Number.isFinite(x)?(isPct?x/100:x):0};
+  const fmt=v=>new Intl.NumberFormat('pt-BR',{maximumFractionDigits:0}).format(Math.round(n(v))), pct=v=>new Intl.NumberFormat('pt-BR',{style:'percent',maximumFractionDigits:1}).format(n(v));
   const esc=v=>clean(v).replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const dateFmt=v=>{try{return new Intl.DateTimeFormat('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'}).format(new Date(v))}catch{return '—'}};
   const dateTimeFmt=v=>{try{return new Intl.DateTimeFormat('pt-BR',{dateStyle:'short',timeStyle:'short'}).format(new Date(v))}catch{return '—'}};
   const cfg=()=>({url:localStorage.getItem('reposicao_v4_manager_url')||'',key:localStorage.getItem('reposicao_v4_manager_key')||''});
+  const AUTO_REFRESH_MS=30000;
+  let liveTimer=null,isLoading=false,lastLoadAt=0,failCount=0;
 
   function normalizeState(rows){return (rows||[]).map(r=>({vendedor:clean(r.vendedor??r.Vendedor),cliente:clean(r.cliente??r.Cliente),produto:clean(r.produto??r.Produto),estoqueAtual:n(r.estoqueAtual??r['Estoque Atual']),mediaVendasSemanal:n(r.mediaVendasSemanal??r['Média Vendas Semanal']),estoqueIdeal:n(r.estoqueIdeal??r['Estoque Ideal']),sugestao:n(r.sugestao??r['Sugestão Reposição']),ultimoPedido:n(r.ultimoPedido??r['Último Pedido Confirmado']),vendaEstimada:n(r.vendaEstimada??r['Venda Estimada Último Ciclo']),trocas:n(r.trocas??r['Trocas Último Ciclo']),atualizadoEm:clean(r.atualizadoEm??r['Última Atualização']),status:clean(r.status??r.Status)})).filter(r=>r.cliente&&r.produto)}
   function normalizeHistory(rows){return (rows||[]).map(r=>({id:clean(r.id??r.ID),dataHora:clean(r.dataHora??r['Data/Hora']),data:clean(r.data??r.Data),vendedor:clean(r.vendedor??r.Vendedor),cliente:clean(r.cliente??r.Cliente),produto:clean(r.produto??r.Produto),estoqueContado:n(r.estoqueContado??r['Estoque Contado']),vendaEstimada:n(r.vendaEstimada??r['Venda Estimada']),estoqueIdeal:n(r.estoqueIdeal??r['Estoque Ideal']),sugestao:n(r.sugestao??r['Sugestão Sistema']),pedidoConfirmado:n(r.pedidoConfirmado??r['Pedido Confirmado']),diferencaPedido:n(r.diferencaPedido??r['Diferença Pedido']),aderencia:n(r.aderencia??r['Aderência %']),excessoPotencial:n(r.excessoPotencial??r['Excesso Potencial']),trocas:n(r.trocas??r['Trocas/Devoluções']),taxaTrocas:n(r.taxaTrocas??r['Taxa Trocas %']),status:clean(r.status??r.Status),origem:clean(r.origem??r.Origem),cicloId:clean(r.cicloId??r['Ciclo ID'])})).filter(r=>r.vendedor&&r.cliente&&r.produto)}
   function normalizeSellers(rows){return (rows||[]).map(r=>({vendedor:clean(r.vendedor??r.Vendedor),lojas:r.lojas||[r['Loja 1'],r['Loja 2']].map(clean).filter(Boolean),ativo:r.ativo!==false&&clean(r.Ativo||'SIM').toUpperCase()!=='NÃO'})).filter(r=>r.vendedor)}
 
   function setData(raw,demo=false){data={state:normalizeState(raw.state||raw.rowsState||DEMO.state),history:normalizeHistory(raw.history||raw.rowsHistory||DEMO.history),sellers:normalizeSellers(raw.sellers||DEMO.sellers),updatedAt:raw.updatedAt||new Date().toISOString(),demo};fillFilters();setMode(!demo);renderAll()}
-  function setMode(live){els.live.classList.toggle('live',live);els.live.querySelector('span').textContent=live?'LIVE':'DEMO';els.connDot.classList.toggle('live',live);els.connTitle.textContent=live?'Planilha conectada':'Modo demonstração';els.connSub.textContent=live?'Dados recebidos via n8n':'Conecte o n8n para dados ao vivo'}
+  function setMode(live){els.live.classList.toggle('live',live);els.live.querySelector('span').textContent=live?'AO VIVO · 30s':'DEMO';els.connDot.classList.toggle('live',live);els.connTitle.textContent=live?'Planilha conectada':'Modo demonstração';els.connSub.textContent=live?'Atualização automática a cada 30 segundos':'Conecte o n8n para dados ao vivo'}
   function fillFilters(){
     const current={seller:els.seller.value,store:els.store.value,product:els.product.value};
     const sellers=[...new Set(data.history.map(r=>r.vendedor))].sort(),stores=[...new Set(data.history.map(r=>r.cliente))].sort(),products=[...new Set(data.history.map(r=>r.produto))];
@@ -72,11 +76,46 @@
   function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
   function setView(name){$$('.view').forEach(v=>v.classList.toggle('active',v.id===`view-${name}`));$$('.nav').forEach(b=>b.classList.toggle('active',b.dataset.view===name));$('#pageTitle').textContent={overview:'Visão geral',sellers:'Vendedores',stores:'Lojas',products:'Produtos',history:'Histórico',alerts:'Alertas'}[name]||'Gestão';$('#sidebar').classList.remove('open');if(name==='overview')setTimeout(()=>{renderSellerChart(aggBy(filteredHistory(),'vendedor').sort((a,b)=>b.excess-a.excess));renderTrend(filteredHistory())},20)}
 
-  async function loadLive(test=false){const c=cfg();if(!c.url){setData(DEMO,true);return false}try{if(test)els.connMsg.textContent='Testando conexão...';const sep=c.url.includes('?')?'&':'?';const res=await fetch(`${c.url}${sep}chave=${encodeURIComponent(c.key)}`,{headers:{Accept:'application/json'},cache:'no-store'});const raw=await res.json();if(!res.ok||raw.ok===false)throw new Error(raw.error||`HTTP ${res.status}`);if(!raw.history||!raw.state)throw new Error('O webhook não retornou state + history.');setData(raw,false);if(test)els.connMsg.textContent=`Conectado: ${raw.history.length} registros históricos.`;return true}catch(e){if(test)els.connMsg.textContent=e.message;else toast('Não foi possível atualizar. Mantendo os últimos dados.');return false}}
+  async function loadLive(test=false,silent=false){
+    const c=cfg();
+    if(!c.url){stopAutoRefresh();setData(DEMO,true);return false}
+    if(isLoading)return false;
+    isLoading=true;
+    const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),20000);
+    try{
+      if(test)els.connMsg.textContent='Testando conexão...';
+      els.live.querySelector('span').textContent='ATUALIZANDO...';
+      const sep=c.url.includes('?')?'&':'?';
+      const res=await fetch(`${c.url}${sep}chave=${encodeURIComponent(c.key)}&_ts=${Date.now()}`,{headers:{Accept:'application/json'},cache:'no-store',signal:controller.signal});
+      const text=await res.text();
+      if(!text.trim())throw new Error(`O n8n respondeu sem conteúdo (HTTP ${res.status}).`);
+      let raw;try{raw=JSON.parse(text)}catch{throw new Error(`O n8n respondeu em formato inválido (HTTP ${res.status}).`)}
+      if(!res.ok||raw.ok===false)throw new Error(raw.error||`Erro HTTP ${res.status}`);
+      if(!Array.isArray(raw.history)||!Array.isArray(raw.state))throw new Error('O webhook não retornou state + history.');
+      setData(raw,false);lastLoadAt=Date.now();failCount=0;
+      els.connSub.textContent='Atualização automática a cada 30 segundos';
+      if(test)els.connMsg.textContent=`Conectado: ${raw.history.length} registros históricos.`;
+      return true;
+    }catch(e){
+      failCount++;
+      const msg=e.name==='AbortError'?'Tempo limite ao consultar o n8n.':e.message;
+      els.live.querySelector('span').textContent=data.demo?'DEMO':'AO VIVO · INSTÁVEL';
+      if(!data.demo)els.connSub.textContent=`Falha de sincronização · nova tentativa automática`;
+      if(test)els.connMsg.textContent=msg;else if(!silent)toast('Não foi possível atualizar. Mantendo os últimos dados.');
+      return false;
+    }finally{clearTimeout(timeout);isLoading=false}
+  }
+  function stopAutoRefresh(){if(liveTimer){clearInterval(liveTimer);liveTimer=null}}
+  function startAutoRefresh(){stopAutoRefresh();if(!cfg().url)return;liveTimer=setInterval(()=>{if(!document.hidden&&!isLoading)loadLive(false,true)},AUTO_REFRESH_MS)}
+  function refreshIfStale(){if(cfg().url&&!document.hidden&&!isLoading&&Date.now()-lastLoadAt>15000)loadLive(false,true)}
   function openConnection(){const c=cfg();els.managerUrl.value=c.url;els.managerKey.value=c.key;els.connMsg.textContent='';els.modal.classList.remove('hidden')}
   function closeConnection(){els.modal.classList.add('hidden')}
 
-  [els.period,els.seller,els.store,els.product].forEach(x=>x.addEventListener('change',renderAll));$$('.nav').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.view)));$$('[data-go]').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.go)));$('#menuBtn').onclick=()=>$('#sidebar').classList.toggle('open');$('#refreshBtn').onclick=()=>cfg().url?loadLive(false):renderAll();$('#connectionBtn').onclick=openConnection;$('#closeModal').onclick=closeConnection;els.modal.onclick=e=>{if(e.target===els.modal)closeConnection()};$('#useDemo').onclick=()=>{localStorage.removeItem('reposicao_v4_manager_url');localStorage.removeItem('reposicao_v4_manager_key');setData(DEMO,true);els.connMsg.textContent='Modo demonstração ativado.';setTimeout(closeConnection,500)};$('#saveConnection').onclick=async()=>{const u=els.managerUrl.value.trim(),k=els.managerKey.value.trim();if(!/^https?:\/\//i.test(u)){els.connMsg.textContent='Informe uma URL completa.';return}localStorage.setItem('reposicao_v4_manager_url',u);localStorage.setItem('reposicao_v4_manager_key',k);const ok=await loadLive(true);if(ok)setTimeout(closeConnection,700)};$('#drawerClose').onclick=closeDrawer;els.drawerBack.onclick=closeDrawer;$('#exportOverview').onclick=()=>csv(filteredHistory());$('#exportHistory').onclick=()=>csv(filteredHistory());window.addEventListener('resize',()=>{if($('#view-overview').classList.contains('active')){renderSellerChart(aggBy(filteredHistory(),'vendedor').sort((a,b)=>b.excess-a.excess));renderTrend(filteredHistory())}});
+  [els.period,els.seller,els.store,els.product].forEach(x=>x.addEventListener('change',renderAll));$$('.nav').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.view)));$$('[data-go]').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.go)));$('#menuBtn').onclick=()=>$('#sidebar').classList.toggle('open');$('#refreshBtn').onclick=()=>cfg().url?loadLive(false,false):renderAll();$('#connectionBtn').onclick=openConnection;$('#closeModal').onclick=closeConnection;els.modal.onclick=e=>{if(e.target===els.modal)closeConnection()};$('#useDemo').onclick=()=>{stopAutoRefresh();localStorage.removeItem('reposicao_v4_manager_url');localStorage.removeItem('reposicao_v4_manager_key');setData(DEMO,true);els.connMsg.textContent='Modo demonstração ativado.';setTimeout(closeConnection,500)};$('#saveConnection').onclick=async()=>{const u=els.managerUrl.value.trim(),k=els.managerKey.value.trim();if(!/^https?:\/\//i.test(u)){els.connMsg.textContent='Informe uma URL completa.';return}localStorage.setItem('reposicao_v4_manager_url',u);localStorage.setItem('reposicao_v4_manager_key',k);const ok=await loadLive(true,false);if(ok){startAutoRefresh();setTimeout(closeConnection,700)}};$('#drawerClose').onclick=closeDrawer;els.drawerBack.onclick=closeDrawer;$('#exportOverview').onclick=()=>csv(filteredHistory());$('#exportHistory').onclick=()=>csv(filteredHistory());window.addEventListener('resize',()=>{if($('#view-overview').classList.contains('active')){renderSellerChart(aggBy(filteredHistory(),'vendedor').sort((a,b)=>b.excess-a.excess));renderTrend(filteredHistory())}});
 
-  setData(DEMO,true);if(cfg().url)loadLive(false);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshIfStale()});
+  window.addEventListener('focus',refreshIfStale);
+
+  setData(DEMO,true);
+  if(cfg().url){loadLive(false,true).finally(startAutoRefresh)}
 })();
