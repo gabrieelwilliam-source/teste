@@ -1,13 +1,23 @@
-# Dashboard Gestor V4.4 — Realtime
+# Dashboard Gestor V4.6 — Interface Intuitiva
 
-- Atualização automática a cada 30 segundos.
-- Atualiza imediatamente ao voltar para a aba se os dados estiverem defasados.
-- Impede requisições simultâneas.
-- Mantém os últimos dados válidos quando houver falha temporária.
-- Trata resposta vazia/não-JSON do n8n sem expor erro técnico ao usuário.
-- Compatível com o workflow REPOSICAO_INTELIGENTE_V4.4_ESTAVEL_REALTIME.json.
+Esta versão mantém a integração e atualização automática da V4.5, mas reorganiza a interface para leitura gerencial rápida.
 
-Use a Production URL `/webhook/reposicao-gestor` e a chave definida em `API Config`.
+## O que mudou
+- Menu com linguagem mais direta: Resumo, Equipe, Lojas, Produtos, Movimentações e Atenção.
+- Tela inicial organizada por prioridade: situação geral → números principais → onde agir → últimas movimentações.
+- Quatro indicadores principais: Pedido realizado, Pedido recomendado, Excesso potencial e Trocas/devoluções.
+- Indicadores técnicos ficam em segundo nível.
+- Gráficos ficam recolhidos em “Ver análises e gráficos detalhados”.
+- Vendedores, lojas e produtos recebem status simples: BOM, ATENÇÃO ou CRÍTICO.
+- Estados vazios explicativos quando um filtro não possui registros.
+- Linguagem dos títulos e tabelas simplificada.
 
+## Instalação
+Substitua no GitHub Pages os arquivos:
+- index.html
+- styles.css
+- app.js
+- demo-data.js
 
-V4.5: corrige datas seriais do Google Sheets, filtros por período, reset de filtros ao conectar e mantém atualização automática a cada 30s.
+A URL do n8n e a chave continuam salvas no navegador pelas mesmas chaves do dashboard anterior.
+Não é necessário alterar o workflow n8n.

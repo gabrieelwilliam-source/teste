@@ -1,24 +1,27 @@
-<!-- Reposicao Inteligente V4.1 - Dashboard Gestor -->
 <!doctype html>
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#0b1739">
-  <title>Gestão de Reposição</title>
+  <title>Reposição Inteligente — Gestão</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="layout">
     <aside id="sidebar" class="sidebar">
-      <div class="logo"><div class="logo-mark">RI</div><div><strong>Reposição</strong><span>Gestão inteligente</span></div></div>
+      <div class="logo">
+        <div class="logo-mark">RI</div>
+        <div><strong>Reposição</strong><span>Controle de perdas</span></div>
+      </div>
+      <div class="nav-caption">ACOMPANHAMENTO</div>
       <nav>
-        <button class="nav active" data-view="overview"><span>▦</span>Visão geral</button>
-        <button class="nav" data-view="sellers"><span>◎</span>Vendedores</button>
-        <button class="nav" data-view="stores"><span>□</span>Lojas</button>
-        <button class="nav" data-view="products"><span>▤</span>Produtos</button>
-        <button class="nav" data-view="history"><span>↺</span>Histórico</button>
-        <button class="nav" data-view="alerts"><span>!</span>Alertas <b id="alertBadge">0</b></button>
+        <button class="nav active" data-view="overview"><span>▦</span><div><strong>Resumo</strong><small>O que está acontecendo</small></div></button>
+        <button class="nav" data-view="sellers"><span>◎</span><div><strong>Equipe</strong><small>Como cada vendedor está</small></div></button>
+        <button class="nav" data-view="stores"><span>□</span><div><strong>Lojas</strong><small>Onde há maior risco</small></div></button>
+        <button class="nav" data-view="products"><span>▤</span><div><strong>Produtos</strong><small>Desempenho por item</small></div></button>
+        <button class="nav" data-view="history"><span>↺</span><div><strong>Movimentações</strong><small>O que já foi registrado</small></div></button>
+        <button class="nav" data-view="alerts"><span>!</span><div><strong>Atenção</strong><small>O que precisa ser revisto</small></div><b id="alertBadge">0</b></button>
       </nav>
       <div class="sidebar-bottom">
         <button id="connectionBtn" class="connection"><span id="connectionDot"></span><div><strong id="connectionTitle">Modo demonstração</strong><small id="connectionSub">Conecte o n8n para dados ao vivo</small></div></button>
@@ -28,66 +31,81 @@
     <main class="main">
       <header class="topbar">
         <button id="menuBtn" class="menu-btn">☰</button>
-        <div><span class="eyebrow">GESTÃO COMERCIAL · ESTOQUE · VALIDADE</span><h1 id="pageTitle">Visão geral</h1></div>
-        <div class="top-actions"><span id="liveBadge" class="live-badge"><i></i><span>DEMO</span></span><button id="refreshBtn" class="square-btn">↻</button></div>
+        <div class="title-wrap"><span class="eyebrow">CONTROLE DE REPOSIÇÃO E PERDAS</span><h1 id="pageTitle">Resumo da operação</h1></div>
+        <div class="top-actions"><span id="liveBadge" class="live-badge"><i></i><span>DEMO</span></span><button id="refreshBtn" class="square-btn" title="Atualizar agora">↻</button></div>
       </header>
 
       <section class="content">
         <div class="filterbar">
+          <div class="filter-intro"><strong>O que você quer analisar?</strong><span>Use os filtros para detalhar o painel.</span></div>
           <label>Período<select id="periodFilter"><option value="7">Últimos 7 dias</option><option value="30" selected>Últimos 30 dias</option><option value="90">Últimos 90 dias</option><option value="all">Todo o histórico</option></select></label>
           <label>Vendedor<select id="sellerFilter"><option value="">Todos</option></select></label>
           <label>Loja<select id="storeFilter"><option value="">Todas</option></select></label>
           <label>Produto<select id="productFilter"><option value="">Todos</option></select></label>
-          <div class="updated"><span>Última atualização</span><strong id="updatedAt">—</strong></div>
+          <div class="updated"><span>Dados atualizados</span><strong id="updatedAt">—</strong></div>
         </div>
 
         <section id="view-overview" class="view active">
+          <div class="page-intro">
+            <div><span class="section-label">LEITURA RÁPIDA</span><h2>Entenda a operação em poucos segundos</h2><p>Compare o que o sistema recomendou com o que realmente foi pedido e veja onde há risco de excesso.</p></div>
+          </div>
+
           <div id="executiveAlert" class="executive-alert"></div>
-          <div class="kpi-grid">
-            <article class="kpi accent"><span>Pedidos confirmados</span><strong id="kpiOrders">0</strong><small>unidades no período</small></article>
-            <article class="kpi"><span>Sugestão do sistema</span><strong id="kpiSuggested">0</strong><small>referência calculada</small></article>
-            <article class="kpi danger"><span>Excesso potencial</span><strong id="kpiExcess">0</strong><small id="kpiExcessPct">0% do pedido</small></article>
-            <article class="kpi"><span>Vendas estimadas</span><strong id="kpiSales">0</strong><small>entre visitas</small></article>
-            <article class="kpi"><span>Aderência à sugestão</span><strong id="kpiAdherence">0%</strong><small>média dos pedidos</small></article>
-            <article class="kpi"><span>Lojas visitadas</span><strong id="kpiVisits">0</strong><small id="kpiVisitsSub">de 20 lojas</small></article>
+
+          <div class="primary-kpis">
+            <article class="kpi primary blue"><div class="kpi-icon">✓</div><div><span>Pedido realizado</span><strong id="kpiOrders">0</strong><small>unidades confirmadas pelos vendedores</small></div></article>
+            <article class="kpi primary neutral"><div class="kpi-icon">◎</div><div><span>Pedido recomendado</span><strong id="kpiSuggested">0</strong><small>quanto o sistema calculou</small></div></article>
+            <article class="kpi primary red"><div class="kpi-icon">!</div><div><span>Excesso potencial</span><strong id="kpiExcess">0</strong><small id="kpiExcessPct">0% do pedido</small></div></article>
+            <article class="kpi primary amber"><div class="kpi-icon">↺</div><div><span>Trocas / devoluções</span><strong id="kpiReturns">0</strong><small>unidades retornadas no período</small></div></article>
           </div>
 
-          <div class="grid-2">
-            <article class="panel chart-panel"><div class="panel-head"><div><span class="section-label">COMPARATIVO</span><h2>Sugerido x confirmado por vendedor</h2></div><div class="legend"><i class="suggested"></i>Sugerido<i class="confirmed"></i>Confirmado</div></div><canvas id="sellerChart" height="330"></canvas></article>
-            <article class="panel"><div class="panel-head"><div><span class="section-label">EFICIÊNCIA</span><h2>Indicadores de controle</h2></div></div><div id="efficiencyCards" class="efficiency-list"></div></article>
+          <div class="secondary-kpis">
+            <article class="mini-kpi"><span>Aderência à recomendação <i title="Quanto os pedidos ficaram próximos da quantidade sugerida pelo sistema.">?</i></span><strong id="kpiAdherence">0%</strong><small>quanto os vendedores seguiram a sugestão</small></article>
+            <article class="mini-kpi"><span>Lojas visitadas</span><strong id="kpiVisits">0</strong><small id="kpiVisitsSub">0 lojas no período</small></article>
+            <article class="mini-kpi"><span>Venda estimada <i title="Estimativa calculada entre uma visita e outra. Não substitui o dado fiscal do ERP.">?</i></span><strong id="kpiSales">0</strong><small>unidades estimadas entre visitas</small></article>
           </div>
 
-          <div class="grid-2 lower">
-            <article class="panel"><div class="panel-head"><div><span class="section-label">TENDÊNCIA</span><h2>Pedidos ao longo do período</h2></div></div><canvas id="trendChart" height="290"></canvas></article>
-            <article class="panel"><div class="panel-head"><div><span class="section-label">ATENÇÃO</span><h2>Maiores excessos potenciais</h2></div><button class="link-btn" data-go="alerts">Ver alertas</button></div><div id="topRisks" class="risk-list"></div></article>
+          <div class="action-grid">
+            <article class="panel attention-panel"><div class="panel-head"><div><span class="section-label">PRIORIDADE</span><h2>Onde olhar primeiro</h2><p>As lojas abaixo concentram os maiores excessos dentro dos filtros escolhidos.</p></div><button class="link-btn" data-go="alerts">Ver todos os alertas →</button></div><div id="topRisks" class="risk-list"></div></article>
+            <article class="panel control-panel"><div class="panel-head"><div><span class="section-label">SAÚDE DA OPERAÇÃO</span><h2>Indicadores simples</h2><p>Quanto mais verde, melhor o controle.</p></div></div><div id="efficiencyCards" class="efficiency-list"></div></article>
           </div>
 
-          <article class="panel table-panel"><div class="panel-head"><div><span class="section-label">OPERAÇÃO</span><h2>Últimas visitas registradas</h2></div><button id="exportOverview" class="outline-btn">Exportar CSV</button></div><div class="table-wrap"><table><thead><tr><th>Data</th><th>Vendedor</th><th>Loja</th><th>Sugerido</th><th>Pedido</th><th>Diferença</th><th>Aderência</th><th>Status</th></tr></thead><tbody id="latestVisits"></tbody></table></div></article>
+          <article class="panel table-panel important-table"><div class="panel-head"><div><span class="section-label">ÚLTIMAS MOVIMENTAÇÕES</span><h2>O que os vendedores fizeram recentemente</h2><p>Clique em uma linha para ver os cinco produtos daquela visita.</p></div><button id="exportOverview" class="outline-btn">Exportar CSV</button></div><div class="table-wrap"><table><thead><tr><th>Data</th><th>Vendedor</th><th>Loja</th><th>Sistema sugeriu</th><th>Vendedor pediu</th><th>Diferença</th><th>Situação</th></tr></thead><tbody id="latestVisits"></tbody></table></div></article>
+
+          <details id="analysisDetails" class="details-block">
+            <summary>Ver análises e gráficos detalhados</summary>
+            <div class="details-content">
+              <div class="grid-2">
+                <article class="panel chart-panel"><div class="panel-head"><div><span class="section-label">COMPARAÇÃO</span><h2>Recomendado x pedido por vendedor</h2><p>Ajuda a identificar quem mais se distancia da recomendação.</p></div><div class="legend"><i class="suggested"></i>Recomendado<i class="confirmed"></i>Pedido</div></div><canvas id="sellerChart" height="300"></canvas></article>
+                <article class="panel"><div class="panel-head"><div><span class="section-label">TENDÊNCIA</span><h2>Pedidos ao longo do período</h2><p>Volume confirmado ao longo dos dias.</p></div></div><canvas id="trendChart" height="300"></canvas></article>
+              </div>
+            </div>
+          </details>
         </section>
 
         <section id="view-sellers" class="view">
-          <div class="section-intro"><div><span class="section-label">EQUIPE COMERCIAL</span><h2>Desempenho por vendedor</h2><p>Compare volume, aderência à recomendação, excesso potencial e cobertura das lojas.</p></div></div>
+          <div class="section-intro"><div><span class="section-label">EQUIPE</span><h2>Como está cada vendedor?</h2><p>Comece pelo status. Depois compare visitas, excesso e aderência à recomendação.</p></div></div>
           <div id="sellerCards" class="seller-cards"></div>
-          <article class="panel table-panel"><div class="panel-head"><div><span class="section-label">RANKING</span><h2>Comparativo completo</h2></div></div><div class="table-wrap"><table><thead><tr><th>Vendedor</th><th>Lojas</th><th>Visitas</th><th>Sugerido</th><th>Confirmado</th><th>Excesso</th><th>Aderência</th><th>Trocas</th></tr></thead><tbody id="sellerTable"></tbody></table></div></article>
+          <article class="panel table-panel"><div class="panel-head"><div><span class="section-label">COMPARATIVO</span><h2>Todos os vendedores</h2><p>Uma visão mais detalhada para comparação.</p></div></div><div class="table-wrap"><table><thead><tr><th>Vendedor</th><th>Lojas</th><th>Visitas</th><th>Recomendado</th><th>Pedido</th><th>Excesso</th><th>Aderência</th><th>Trocas</th></tr></thead><tbody id="sellerTable"></tbody></table></div></article>
         </section>
 
         <section id="view-stores" class="view">
-          <div class="section-intro"><div><span class="section-label">CARTEIRA</span><h2>Acompanhamento das lojas</h2><p>Veja onde a recomendação está sendo respeitada e onde há maior risco de sobre-estoque.</p></div></div>
+          <div class="section-intro"><div><span class="section-label">LOJAS</span><h2>Quais lojas exigem mais atenção?</h2><p>Cada card resume pedido, excesso, aderência e trocas. Clique para abrir os detalhes.</p></div></div>
           <div id="storeGrid" class="entity-grid"></div>
         </section>
 
         <section id="view-products" class="view">
-          <div class="section-intro"><div><span class="section-label">PORTFÓLIO</span><h2>Análise por produto</h2><p>Identifique produtos com maior volume, excesso, giro estimado e devoluções.</p></div></div>
+          <div class="section-intro"><div><span class="section-label">PRODUTOS</span><h2>Quais produtos estão gerando mais excesso?</h2><p>Compare os cinco produtos para identificar os itens mais sensíveis à reposição.</p></div></div>
           <div id="productGrid" class="entity-grid"></div>
         </section>
 
         <section id="view-history" class="view">
-          <div class="section-intro history-head"><div><span class="section-label">AUDITORIA</span><h2>Histórico operacional</h2><p>Cada confirmação deixa um registro rastreável por vendedor, loja e produto.</p></div><button id="exportHistory" class="outline-btn">Exportar CSV</button></div>
-          <article class="panel table-panel"><div class="table-wrap history-table"><table><thead><tr><th>Data</th><th>Vendedor</th><th>Loja</th><th>Produto</th><th>Estoque</th><th>Venda est.</th><th>Sugestão</th><th>Pedido</th><th>Dif.</th><th>Aderência</th><th>Trocas</th></tr></thead><tbody id="historyTable"></tbody></table></div></article>
+          <div class="section-intro history-head"><div><span class="section-label">MOVIMENTAÇÕES</span><h2>Registro de tudo o que foi feito</h2><p>Histórico completo por data, vendedor, loja e produto.</p></div><button id="exportHistory" class="outline-btn">Exportar CSV</button></div>
+          <article class="panel table-panel"><div class="table-wrap history-table"><table><thead><tr><th>Data</th><th>Vendedor</th><th>Loja</th><th>Produto</th><th>Estoque contado</th><th>Venda estimada</th><th>Recomendado</th><th>Pedido</th><th>Diferença</th><th>Aderência</th><th>Trocas</th></tr></thead><tbody id="historyTable"></tbody></table></div></article>
         </section>
 
         <section id="view-alerts" class="view">
-          <div class="section-intro"><div><span class="section-label">CENTRAL DE EXCEÇÕES</span><h2>Alertas que merecem revisão</h2><p>O sistema prioriza pedidos muito acima da recomendação, baixa aderência e devoluções relevantes.</p></div></div>
+          <div class="section-intro"><div><span class="section-label">ATENÇÃO</span><h2>O que precisa ser revisto?</h2><p>O sistema coloca primeiro os desvios que podem gerar mais estoque parado, trocas ou perdas.</p></div></div>
           <div id="alertsList" class="alerts-list"></div>
         </section>
       </section>
