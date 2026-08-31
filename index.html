@@ -1,123 +1,79 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#0b1739">
-  <title>Reposição Inteligente — Gestão</title>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0b1739">
+  <title>Reposição Inteligente FR · Gestão</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="layout">
     <aside id="sidebar" class="sidebar">
-      <div class="logo">
-        <div class="logo-mark">RI</div>
-        <div><strong>Reposição</strong><span>Controle de perdas</span></div>
-      </div>
-      <div class="nav-caption">ACOMPANHAMENTO</div>
+      <div class="brand"><div class="brandmark fr-brandmark"><img src="assets/products/fr-logo.webp" alt="FR Distribuidora"></div><div><strong>Reposição</strong><span>Gestão inteligente</span></div></div>
       <nav>
-        <button class="nav active" data-view="overview"><span>▦</span><div><strong>Resumo</strong><small>O que está acontecendo</small></div></button>
-        <button class="nav" data-view="sellers"><span>◎</span><div><strong>Equipe</strong><small>Como cada vendedor está</small></div></button>
-        <button class="nav" data-view="stores"><span>□</span><div><strong>Lojas</strong><small>Onde há maior risco</small></div></button>
-        <button class="nav" data-view="products"><span>▤</span><div><strong>Produtos</strong><small>Desempenho por item</small></div></button>
-        <button class="nav" data-view="history"><span>↺</span><div><strong>Movimentações</strong><small>O que já foi registrado</small></div></button>
-        <button class="nav" data-view="alerts"><span>!</span><div><strong>Atenção</strong><small>O que precisa ser revisto</small></div><b id="alertBadge">0</b></button>
+        <button class="nav active" data-view="overview">▦ <span>Resumo</span></button>
+        <button class="nav" data-view="alerts">! <span>Atenção</span><b id="alertCount" class="nav-count">0</b></button>
+        <button class="nav" data-view="sellers">◎ <span>Vendedores</span></button>
+        <button class="nav" data-view="stores">□ <span>Lojas</span></button>
+        <button class="nav" data-view="products">▤ <span>Produtos</span></button>
+        <button class="nav" data-view="visits">⌖ <span>Visitas GPS</span></button>
+        <button class="nav" data-view="history">↺ <span>Histórico</span></button>
+        <button class="nav" data-view="report">▣ <span>Relatório</span></button>
+        <button class="nav" data-view="admin">⚙ <span>Administração</span></button>
       </nav>
-      <div class="sidebar-bottom">
-        <button id="connectionBtn" class="connection"><span id="connectionDot"></span><div><strong id="connectionTitle">Modo demonstração</strong><small id="connectionSub">Conecte o n8n para dados ao vivo</small></div></button>
-      </div>
+      <div class="side-status"><div><span id="connDot" class="dot"></span><strong id="connTitle">Demonstração</strong></div><small id="connSub">Configure o n8n para dados reais</small><button id="connectionBtn" class="side-link">Configurar</button></div>
     </aside>
 
     <main class="main">
-      <header class="topbar">
-        <button id="menuBtn" class="menu-btn">☰</button>
-        <div class="title-wrap"><span class="eyebrow">CONTROLE DE REPOSIÇÃO E PERDAS</span><h1 id="pageTitle">Resumo da operação</h1></div>
-        <div class="top-actions"><span id="liveBadge" class="live-badge"><i></i><span>DEMO</span></span><button id="refreshBtn" class="square-btn" title="Atualizar agora">↻</button></div>
-      </header>
+      <header class="topbar"><button id="menuBtn" class="menu-btn">☰</button><div><p>GESTÃO COMERCIAL · ESTOQUE · VALIDADE · VISITAS</p><h1 id="pageTitle">Resumo da operação</h1></div><div class="top-actions"><span id="liveBadge" class="live"><i></i><span>DEMO</span></span><button id="refreshBtn" class="icon-btn">↻</button></div></header>
 
-      <section class="content">
-        <div class="filterbar">
-          <div class="filter-intro"><strong>O que você quer analisar?</strong><span>Use os filtros para detalhar o painel.</span></div>
-          <label>Período<select id="periodFilter"><option value="7">Últimos 7 dias</option><option value="30" selected>Últimos 30 dias</option><option value="90">Últimos 90 dias</option><option value="all">Todo o histórico</option></select></label>
-          <label>Vendedor<select id="sellerFilter"><option value="">Todos</option></select></label>
-          <label>Loja<select id="storeFilter"><option value="">Todas</option></select></label>
-          <label>Produto<select id="productFilter"><option value="">Todos</option></select></label>
-          <div class="updated"><span>Dados atualizados</span><strong id="updatedAt">—</strong></div>
-        </div>
+      <section class="filters panel">
+        <label>Período<select id="periodFilter"><option value="7">Últimos 7 dias</option><option value="30" selected>Últimos 30 dias</option><option value="90">Últimos 90 dias</option><option value="all">Todo histórico</option></select></label>
+        <label>Vendedor<select id="sellerFilter"></select></label><label>Loja<select id="storeFilter"></select></label><label>Produto<select id="productFilter"></select></label>
+        <div class="updated"><span>Última atualização</span><strong id="updatedAt">—</strong></div>
+      </section>
 
-        <section id="view-overview" class="view active">
-          <div class="page-intro">
-            <div><span class="section-label">LEITURA RÁPIDA</span><h2>Entenda a operação em poucos segundos</h2><p>Compare o que o sistema recomendou com o que realmente foi pedido e veja onde há risco de excesso.</p></div>
-          </div>
-
-          <div id="executiveAlert" class="executive-alert"></div>
-
-          <div class="primary-kpis">
-            <article class="kpi primary blue"><div class="kpi-icon">✓</div><div><span>Pedido realizado</span><strong id="kpiOrders">0</strong><small>unidades confirmadas pelos vendedores</small></div></article>
-            <article class="kpi primary neutral"><div class="kpi-icon">◎</div><div><span>Pedido recomendado</span><strong id="kpiSuggested">0</strong><small>quanto o sistema calculou</small></div></article>
-            <article class="kpi primary red"><div class="kpi-icon">!</div><div><span>Excesso potencial</span><strong id="kpiExcess">0</strong><small id="kpiExcessPct">0% do pedido</small></div></article>
-            <article class="kpi primary amber"><div class="kpi-icon">↺</div><div><span>Trocas / devoluções</span><strong id="kpiReturns">0</strong><small>unidades retornadas no período</small></div></article>
-          </div>
-
-          <div class="secondary-kpis">
-            <article class="mini-kpi"><span>Aderência à recomendação <i title="Quanto os pedidos ficaram próximos da quantidade sugerida pelo sistema.">?</i></span><strong id="kpiAdherence">0%</strong><small>quanto os vendedores seguiram a sugestão</small></article>
-            <article class="mini-kpi"><span>Lojas visitadas</span><strong id="kpiVisits">0</strong><small id="kpiVisitsSub">0 lojas no período</small></article>
-            <article class="mini-kpi"><span>Venda estimada <i title="Estimativa calculada entre uma visita e outra. Não substitui o dado fiscal do ERP.">?</i></span><strong id="kpiSales">0</strong><small>unidades estimadas entre visitas</small></article>
-          </div>
-
-          <div class="action-grid">
-            <article class="panel attention-panel"><div class="panel-head"><div><span class="section-label">PRIORIDADE</span><h2>Onde olhar primeiro</h2><p>As lojas abaixo concentram os maiores excessos dentro dos filtros escolhidos.</p></div><button class="link-btn" data-go="alerts">Ver todos os alertas →</button></div><div id="topRisks" class="risk-list"></div></article>
-            <article class="panel control-panel"><div class="panel-head"><div><span class="section-label">SAÚDE DA OPERAÇÃO</span><h2>Indicadores simples</h2><p>Quanto mais verde, melhor o controle.</p></div></div><div id="efficiencyCards" class="efficiency-list"></div></article>
-          </div>
-
-          <article class="panel table-panel important-table"><div class="panel-head"><div><span class="section-label">ÚLTIMAS MOVIMENTAÇÕES</span><h2>O que os vendedores fizeram recentemente</h2><p>Clique em uma linha para ver os cinco produtos daquela visita.</p></div><button id="exportOverview" class="outline-btn">Exportar CSV</button></div><div class="table-wrap"><table><thead><tr><th>Data</th><th>Vendedor</th><th>Loja</th><th>Sistema sugeriu</th><th>Vendedor pediu</th><th>Diferença</th><th>Situação</th></tr></thead><tbody id="latestVisits"></tbody></table></div></article>
-
-          <details id="analysisDetails" class="details-block">
-            <summary>Ver análises e gráficos detalhados</summary>
-            <div class="details-content">
-              <div class="grid-2">
-                <article class="panel chart-panel"><div class="panel-head"><div><span class="section-label">COMPARAÇÃO</span><h2>Recomendado x pedido por vendedor</h2><p>Ajuda a identificar quem mais se distancia da recomendação.</p></div><div class="legend"><i class="suggested"></i>Recomendado<i class="confirmed"></i>Pedido</div></div><canvas id="sellerChart" height="300"></canvas></article>
-                <article class="panel"><div class="panel-head"><div><span class="section-label">TENDÊNCIA</span><h2>Pedidos ao longo do período</h2><p>Volume confirmado ao longo dos dias.</p></div></div><canvas id="trendChart" height="300"></canvas></article>
-              </div>
-            </div>
-          </details>
+      <section id="view-overview" class="view active">
+        <div id="heroStatus" class="hero-status good"><div class="hero-icon">✓</div><div><p>LEITURA RÁPIDA</p><h2>Operação aguardando dados</h2><span>O painel destacará automaticamente o que precisa da sua atenção.</span></div><div class="hero-number"><strong id="heroAlertNum">0</strong><span>situações</span></div></div>
+        <section class="kpis six">
+          <article class="kpi"><span>Pedido confirmado</span><strong id="kConfirmed">0</strong><small>unidades no período</small></article>
+          <article class="kpi"><span>Pedido recomendado</span><strong id="kSuggested">0</strong><small>referência do sistema</small></article>
+          <article class="kpi danger"><span>Excesso potencial</span><strong id="kExcess">0</strong><small id="kExcessPct">0% do pedido</small></article>
+          <article class="kpi"><span>Trocas / devoluções</span><strong id="kReturns">0</strong><small>unidades informadas</small></article>
+          <article class="kpi money"><span>Risco financeiro</span><strong id="kRisk">R$ 0</strong><small>excesso × custo</small></article>
+          <article class="kpi money"><span>Economia estimada</span><strong id="kSavings">R$ 0</strong><small>vs. pedido anterior</small></article>
         </section>
-
-        <section id="view-sellers" class="view">
-          <div class="section-intro"><div><span class="section-label">EQUIPE</span><h2>Como está cada vendedor?</h2><p>Comece pelo status. Depois compare visitas, excesso e aderência à recomendação.</p></div></div>
-          <div id="sellerCards" class="seller-cards"></div>
-          <article class="panel table-panel"><div class="panel-head"><div><span class="section-label">COMPARATIVO</span><h2>Todos os vendedores</h2><p>Uma visão mais detalhada para comparação.</p></div></div><div class="table-wrap"><table><thead><tr><th>Vendedor</th><th>Lojas</th><th>Visitas</th><th>Recomendado</th><th>Pedido</th><th>Excesso</th><th>Aderência</th><th>Trocas</th></tr></thead><tbody id="sellerTable"></tbody></table></div></article>
+        <section class="grid-main">
+          <article class="panel attention-card"><div class="section-head"><div><p>ONDE OLHAR PRIMEIRO</p><h2>Prioridades da operação</h2></div><button class="link-btn" data-go="alerts">Ver todas</button></div><div id="priorityList" class="priority-list"></div></article>
+          <article class="panel control-card"><div class="section-head"><div><p>CONTROLE</p><h2>Indicadores simples</h2></div></div><div class="control-list"><div><span>Aderência à recomendação</span><strong id="cAdherence">0%</strong><i><b id="barAdherence"></b></i></div><div><span>Lojas visitadas</span><strong id="cCoverage">0/20</strong><i><b id="barCoverage"></b></i></div><div><span>Visitas com GPS válido</span><strong id="cGps">0%</strong><i><b id="barGps"></b></i></div><div><span>Pedidos sem excesso</span><strong id="cNoExcess">0%</strong><i><b id="barNoExcess"></b></i></div></div></article>
         </section>
+        <details class="panel analysis-details"><summary>Ver análises e gráficos detalhados</summary><div class="chart-grid"><article><div class="section-head"><div><p>COMPARATIVO</p><h3>Sugerido x confirmado por vendedor</h3></div></div><canvas id="sellerChart" height="280"></canvas></article><article><div class="section-head"><div><p>TENDÊNCIA</p><h3>Pedidos ao longo do período</h3></div></div><canvas id="trendChart" height="280"></canvas></article></div></details>
+      </section>
 
-        <section id="view-stores" class="view">
-          <div class="section-intro"><div><span class="section-label">LOJAS</span><h2>Quais lojas exigem mais atenção?</h2><p>Cada card resume pedido, excesso, aderência e trocas. Clique para abrir os detalhes.</p></div></div>
-          <div id="storeGrid" class="entity-grid"></div>
-        </section>
+      <section id="view-alerts" class="view"><div class="page-intro"><p>EXCEÇÕES</p><h2>O que precisa de atenção</h2><span>O sistema reúne desvios de pedido, trocas, validade, GPS e lojas sem atualização.</span></div><div id="alertsList" class="alert-list"></div></section>
+      <section id="view-sellers" class="view"><div class="page-intro"><p>EQUIPE</p><h2>Vendedores</h2><span>Veja rapidamente quem está alinhado, onde há excesso e quando foi a última visita.</span></div><div id="sellerCards" class="cards-grid"></div></section>
+      <section id="view-stores" class="view"><div class="page-intro"><p>LOJAS</p><h2>Desempenho por loja</h2><span>Compare pedido, trocas, validade, última visita e situação GPS.</span></div><div id="storeCards" class="cards-grid"></div></section>
+      <section id="view-products" class="view"><div class="page-intro"><p>PRODUTOS</p><h2>Desempenho por produto</h2><span>Identifique onde cada produto gera excesso, troca ou risco financeiro.</span></div><div id="productCards" class="cards-grid"></div></section>
 
-        <section id="view-products" class="view">
-          <div class="section-intro"><div><span class="section-label">PRODUTOS</span><h2>Quais produtos estão gerando mais excesso?</h2><p>Compare os cinco produtos para identificar os itens mais sensíveis à reposição.</p></div></div>
-          <div id="productGrid" class="entity-grid"></div>
-        </section>
+      <section id="view-visits" class="view"><div class="page-intro"><p>VISITAS</p><h2>Acompanhamento de localização</h2><span>Mostra a última posição enviada pelo vendedor durante uma visita ativa. O rastreamento para quando a visita é encerrada.</span></div><div class="gps-summary"><article class="mini-kpi"><span>Em visita</span><strong id="vActive">0</strong></article><article class="mini-kpi"><span>Dentro da loja</span><strong id="vInside">0</strong></article><article class="mini-kpi"><span>Fora da loja</span><strong id="vOutside">0</strong></article><article class="mini-kpi"><span>Sem GPS recente</span><strong id="vStale">0</strong></article></div><div class="visits-grid"><div class="panel map-panel"><div id="map"></div><div id="mapEmpty" class="map-empty">Cadastre latitude e longitude das lojas para visualizar o mapa.</div></div><div id="liveVisits" class="live-visits"></div></div><p class="privacy-callout">Localização: esta versão registra GPS somente durante uma visita ativa e com permissão do aparelho. Navegadores móveis podem suspender atualizações quando o aplicativo fica totalmente em segundo plano.</p></section>
 
-        <section id="view-history" class="view">
-          <div class="section-intro history-head"><div><span class="section-label">MOVIMENTAÇÕES</span><h2>Registro de tudo o que foi feito</h2><p>Histórico completo por data, vendedor, loja e produto.</p></div><button id="exportHistory" class="outline-btn">Exportar CSV</button></div>
-          <article class="panel table-panel"><div class="table-wrap history-table"><table><thead><tr><th>Data</th><th>Vendedor</th><th>Loja</th><th>Produto</th><th>Estoque contado</th><th>Venda estimada</th><th>Recomendado</th><th>Pedido</th><th>Diferença</th><th>Aderência</th><th>Trocas</th></tr></thead><tbody id="historyTable"></tbody></table></div></article>
-        </section>
+      <section id="view-history" class="view"><div class="page-intro row"><div><p>HISTÓRICO</p><h2>Movimentações registradas</h2><span>Auditoria completa: contagem, recomendação, pedido, motivo, validade, GPS e faturamento.</span></div><button id="exportHistory" class="secondary">Exportar CSV</button></div><div class="panel table-wrap"><table><thead><tr><th>Data</th><th>Vendedor</th><th>Loja</th><th>Produto</th><th>Estoque</th><th>Sugerido</th><th>Pedido</th><th>Excesso</th><th>Trocas</th><th>Validade</th><th>Motivo</th><th>GPS</th><th>Faturado</th></tr></thead><tbody id="historyBody"></tbody></table></div></section>
 
-        <section id="view-alerts" class="view">
-          <div class="section-intro"><div><span class="section-label">ATENÇÃO</span><h2>O que precisa ser revisto?</h2><p>O sistema coloca primeiro os desvios que podem gerar mais estoque parado, trocas ou perdas.</p></div></div>
-          <div id="alertsList" class="alerts-list"></div>
-        </section>
+      <section id="view-report" class="view"><div class="page-intro row"><div><p>RELATÓRIO</p><h2>Resumo para o proprietário</h2><span>Texto pronto para copiar e enviar. O n8n também gera um registro semanal automaticamente.</span></div><button id="copyReport" class="primary small">Copiar resumo</button></div><div class="report-grid"><article class="panel report-card"><h3>Resumo do período</h3><pre id="reportText"></pre></article><article class="panel"><h3>Leitura gerencial</h3><div id="reportInsights" class="insights"></div></article></div></section>
+
+      <section id="view-admin" class="view"><div class="page-intro"><p>ADMINISTRAÇÃO</p><h2>Configuração sem mexer na planilha</h2><span>Cadastre GPS das lojas, custo real dos produtos e acessos dos vendedores. Os valores de tabela FR já ficam disponíveis como referência.</span></div>
+        <div class="admin-tabs"><button class="admin-tab active" data-admin="stores">Lojas e GPS</button><button class="admin-tab" data-admin="products">Produtos e custos</button><button class="admin-tab" data-admin="access">Vendedores</button><button class="admin-tab" data-admin="system">Sistema</button></div>
+        <div id="admin-stores" class="admin-pane active"><div id="adminStores" class="admin-list"></div></div>
+        <div id="admin-products" class="admin-pane"><div id="adminProducts" class="admin-list"></div></div>
+        <div id="admin-access" class="admin-pane"><p class="small-note">Código de acesso é tratado como chave do vendedor. Para evitar duplicidades, ele fica bloqueado para edição no painel.</p><div id="adminAccess" class="admin-list"></div></div>
+        <div id="admin-system" class="admin-pane"><article class="panel admin-system"><label>URL do site do vendedor<input id="adminVendorUrl" type="url"></label><label>Raio GPS padrão (m)<input id="adminRadius" type="number" min="50"></label><label>Atualização do gestor (s)<input id="adminRefresh" type="number" min="15"></label><label class="toggle-row"><input id="adminRequireGps" type="checkbox"><span>Exigir GPS para confirmar pedido</span></label><button id="saveSystem" class="primary small">Salvar configurações</button><div id="adminSystemMsg" class="message"></div></article></div>
       </section>
     </main>
   </div>
 
-  <div id="drawerBackdrop" class="drawer-backdrop hidden"></div>
-  <aside id="drawer" class="drawer" aria-hidden="true"><button id="drawerClose" class="drawer-close">×</button><span class="section-label" id="drawerLabel">DETALHES</span><h2 id="drawerTitle">—</h2><div id="drawerBody"></div></aside>
-
-  <div id="connectionModal" class="modal hidden"><div class="modal-card"><span class="section-label">CONEXÃO</span><h2>Conectar dashboard ao n8n</h2><p>Use a Production URL do webhook <b>reposicao-gestor</b> e a chave configurada na planilha.</p><label>URL do gestor<input id="managerUrl" type="url" placeholder="https://seu-n8n/webhook/reposicao-gestor"></label><label>Chave do gestor<input id="managerKey" type="password" placeholder="GESTOR2026"></label><div id="connectionMessage" class="connection-message"></div><div class="modal-actions"><button id="useDemo" class="outline-btn">Usar demonstração</button><button id="closeModal" class="outline-btn">Cancelar</button><button id="saveConnection" class="primary-btn">Salvar e testar</button></div></div></div>
+  <div id="connectionModal" class="modal hidden"><div class="modal-card"><p class="eyebrow">CONEXÃO</p><h2>Conectar dashboard ao n8n</h2><label>URL do gestor<input id="managerUrl" type="url" placeholder="https://seu-n8n/webhook/reposicao-gestor"></label><label>Chave do gestor<input id="managerKey" type="password"></label><div id="connMessage" class="message"></div><div class="modal-actions"><button id="useDemo" class="secondary">Demonstração</button><button id="closeModal" class="secondary">Cancelar</button><button id="saveConnection" class="primary small">Salvar e testar</button></div></div></div>
+  <div id="qrModal" class="modal hidden"><div class="modal-card qr-card"><p class="eyebrow">QR CODE DA LOJA</p><h2 id="qrTitle">—</h2><img id="qrImage" alt="QR Code"><p id="qrLink" class="qr-link"></p><div class="modal-actions"><button id="copyQrLink" class="secondary">Copiar link</button><button id="closeQr" class="primary small">Fechar</button></div></div></div>
   <div id="toast" class="toast"></div>
-  <script src="demo-data.js"></script>
-  <script src="app.js"></script>
-</body>
-</html>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="demo-data.js"></script><script src="app.js"></script>
+</body></html>
