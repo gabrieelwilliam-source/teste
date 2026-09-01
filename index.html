@@ -68,7 +68,7 @@
     </aside>
 
     <main class="main">
-      <header class="topbar"><button id="menuBtn" class="menu-btn">☰</button><div><p>GESTÃO COMERCIAL · ESTOQUE · VALIDADE · VISITAS</p><h1 id="pageTitle">Operação de hoje</h1></div><div class="top-actions"><span class="manager-version">v7.0</span><span id="liveBadge" class="live"><i></i><span>DEMO</span></span><button id="refreshBtn" class="icon-btn">↻</button></div></header>
+      <header class="topbar"><button id="menuBtn" class="menu-btn">☰</button><div><p>GESTÃO COMERCIAL · ESTOQUE · VALIDADE · VISITAS</p><h1 id="pageTitle">Operação de hoje</h1></div><div class="top-actions"><span class="manager-version">v7.2</span><span id="liveBadge" class="live"><i></i><span>DEMO</span></span><button id="refreshBtn" class="icon-btn">↻</button></div></header>
 
       <section class="filters panel">
         <label>Período<select id="periodFilter"><option value="7">Últimos 7 dias</option><option value="30" selected>Últimos 30 dias</option><option value="90">Últimos 90 dias</option><option value="all">Todo histórico</option></select></label>
@@ -135,7 +135,7 @@
       <section id="view-stores" class="view"><div class="page-intro"><p>LOJAS</p><h2>Desempenho por loja</h2><span>Compare pedido, trocas, validade, última visita e situação GPS.</span></div><div id="storeCards" class="cards-grid"></div></section>
       <section id="view-products" class="view"><div class="page-intro"><p>PRODUTOS</p><h2>Desempenho por produto</h2><span>Identifique onde cada produto gera excesso, troca ou risco financeiro.</span></div><div id="productCards" class="cards-grid"></div></section>
 
-      <section id="view-visits" class="view"><div class="page-intro"><p>ROTAS E VISITAS</p><h2>Acompanhamento do trabalho externo</h2><span>Veja o trajeto, as chegadas e saídas detectadas automaticamente e os pontos onde pedidos foram confirmados.</span></div><div class="route-toolbar panel"><label>Data<input id="routeDate" type="date"></label><label>Vendedor<select id="routeSeller"></select></label><button id="routePlay" class="primary small" type="button">▶ REPRODUZIR</button><div class="route-time"><span>Posição selecionada</span><strong id="routeTime">—</strong></div></div><div class="gps-summary v7"><article class="mini-kpi"><span>Vendedores ao vivo</span><strong id="vActive">0</strong></article><article class="mini-kpi"><span>Visitas detectadas</span><strong id="vInside">0</strong></article><article class="mini-kpi"><span>Distância estimada</span><strong id="vOutside">0 km</strong></article><article class="mini-kpi"><span>Sem sinal há +5 min</span><strong id="vStale">0</strong></article></div><div class="route-layout"><div class="panel map-panel route-map-panel"><div id="map"></div><div id="mapEmpty" class="map-empty">Ainda não há coordenadas para este filtro.</div><div class="route-player"><input id="routeSlider" type="range" min="0" max="0" value="0"><div id="routeCursorInfo" class="route-cursor-info">Selecione um vendedor para reproduzir o trajeto.</div></div></div><div><div id="routeSummary"></div><h3 class="route-side-title">Atividade recente</h3><div id="liveVisits" class="live-visits"></div></div></div><p class="privacy-callout">O rastreamento é iniciado pelo próprio vendedor durante o expediente. No aplicativo Android, o serviço de localização permanece visível na área de notificações enquanto a jornada estiver ativa.</p></section>
+      <section id="view-visits" class="view"><div class="page-intro"><p>ROTAS E VISITAS</p><h2>Acompanhamento do trabalho externo</h2><span>Veja o trajeto, as chegadas e saídas detectadas automaticamente e os pontos onde pedidos foram confirmados.</span></div><div class="route-toolbar panel"><label>Data<input id="routeDate" type="date"></label><label>Vendedor<select id="routeSeller"></select></label><button id="routePlay" class="primary small" type="button">▶ REPRODUZIR</button><div class="route-time"><span>Posição selecionada</span><strong id="routeTime">—</strong></div></div><div class="gps-summary v7"><article class="mini-kpi"><span>Vendedores ao vivo</span><strong id="vActive">0</strong></article><article class="mini-kpi"><span>Visitas detectadas</span><strong id="vInside">0</strong></article><article class="mini-kpi"><span>Distância estimada</span><strong id="vOutside">0 km</strong></article><article class="mini-kpi"><span>Sem sinal há +5 min</span><strong id="vStale">0</strong></article></div><div class="route-layout"><div class="panel map-panel route-map-panel"><div id="map"></div><div id="mapEmpty" class="map-empty">Ainda não há coordenadas para este filtro.</div><div class="route-player"><input id="routeSlider" type="range" min="0" max="0" value="0"><div id="routeCursorInfo" class="route-cursor-info">Selecione um vendedor para reproduzir o trajeto.</div></div></div><div><div id="routeSummary"></div><h3 class="route-side-title">Atividade recente</h3><div id="liveVisits" class="live-visits"></div></div></div><p class="privacy-callout">O rastreamento é iniciado pelo próprio vendedor durante o expediente. O mapa aplica filtro visual contra deriva e saltos de GPS: os pontos continuam registrados no sistema, mas leituras incompatíveis não entram no traçado nem no replay.</p></section>
 
       <section id="view-history" class="view"><div class="page-intro row"><div><p>HISTÓRICO</p><h2>Movimentações registradas</h2><span>Auditoria completa: contagem, recomendação, pedido, motivo, validade, GPS e faturamento.</span></div><button id="exportHistory" class="secondary">Exportar CSV</button></div><div class="panel table-wrap"><table><thead><tr><th>Data</th><th>Vendedor</th><th>Loja</th><th>Produto</th><th>Estoque</th><th>Sugerido</th><th>Pedido</th><th>Excesso</th><th>Trocas</th><th>Validade</th><th>Motivo</th><th>GPS</th><th>Faturado</th></tr></thead><tbody id="historyBody"></tbody></table></div></section>
 
@@ -276,27 +276,94 @@
   function localTrackingDate(){try{return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date())}catch{return new Date().toISOString().slice(0,10)}}
   function routeDateValue(){return $id('routeDate')?.value||localTrackingDate()}
   function routeSellerValue(){return $id('routeSeller')?.value||''}
-  function selectedRoute(){const s=routeSellerValue();return tracking.routePoints.filter(p=>!s||p.sellerName===s).sort((a,b)=>dateMs(a.recordedAt)-dateMs(b.recordedAt))}
+  function rawSelectedRoute(){const s=routeSellerValue();return tracking.routePoints.filter(p=>!s||p.sellerName===s).sort((a,b)=>dateMs(a.recordedAt)-dateMs(b.recordedAt))}
+  function routeMeters(a,b){return haversine(a,b)*1000}
+  function specialRoutePoint(p){const e=String(p?.event||'MOVEMENT').toUpperCase();return e!=='MOVEMENT'&&e!=='GPS'&&e!==''}
+  function routeAccuracy(p){const a=Number(p?.accuracy||0);return Number.isFinite(a)&&a>0?a:12}
+  function visualRouteFilter(raw){
+    const src=(raw||[]).filter(p=>p&&Number.isFinite(p.lat)&&Number.isFinite(p.lon)&&p.lat&&p.lon).sort((a,b)=>dateMs(a.recordedAt)-dateMs(b.recordedAt));
+    if(src.length<3)return src;
+
+    // 1) Remove leituras grosseiramente imprecisas, preservando eventos de negócio.
+    const quality=src.filter(p=>specialRoutePoint(p)||routeAccuracy(p)<=80);
+    if(quality.length<3)return quality;
+
+    // 2) Remove "agulhas": um ponto salta para longe e a leitura seguinte volta
+    // praticamente para onde estava. Esse é o desenho triangular típico de GPS parado.
+    const despiked=[];
+    for(let i=0;i<quality.length;i++){
+      const cur=quality[i];
+      if(i===0||i===quality.length-1||specialRoutePoint(cur)){despiked.push(cur);continue}
+      const prev=quality[i-1],next=quality[i+1];
+      const d1=routeMeters(prev,cur),d2=routeMeters(cur,next),base=routeMeters(prev,next);
+      const dt=Math.max(1,(dateMs(next.recordedAt)-dateMs(prev.recordedAt))/1000);
+      const noise=Math.max(28,Math.min(70,2.6*Math.max(routeAccuracy(prev),routeAccuracy(cur),routeAccuracy(next))));
+      const spike=d1>noise&&d2>noise&&base<Math.max(20,noise*.55)&&dt<=120;
+      if(!spike)despiked.push(cur);
+    }
+    if(despiked.length<2)return despiked;
+
+    // 3) Zona morta visual. Posição pode continuar chegando para manter LIVE,
+    // mas não entra no desenho enquanto estiver dentro da margem normal de erro.
+    const clean=[despiked[0]];
+    for(let i=1;i<despiked.length;i++){
+      const cur=despiked[i],last=clean[clean.length-1];
+      if(specialRoutePoint(cur)){clean.push(cur);continue}
+      const d=routeMeters(last,cur);
+      const dt=Math.max(1,(dateMs(cur.recordedAt)-dateMs(last.recordedAt))/1000);
+      const implied=d/dt;
+      const acc=Math.max(routeAccuracy(last),routeAccuracy(cur));
+      const dead=Math.max(14,Math.min(35,acc*2.1));
+      const sensor=Number(cur.speed||0);
+
+      // Android parado costuma reportar 0 ou velocidades muito baixas.
+      if(sensor>0&&sensor<0.7&&d<Math.max(45,dead*1.8))continue;
+      if(sensor===0&&d<dead)continue;
+
+      // Salto impossível para uma rota comercial normal.
+      if(implied>45)continue;
+
+      // Saltos muito grandes e muito rápidos são tratados como erro de fix.
+      if(dt<12&&d>180)continue;
+
+      clean.push(cur);
+    }
+
+    // 4) Segunda passagem contra ida-e-volta isolada após a zona morta.
+    if(clean.length<3)return clean;
+    const final=[];
+    for(let i=0;i<clean.length;i++){
+      const cur=clean[i];
+      if(i===0||i===clean.length-1||specialRoutePoint(cur)){final.push(cur);continue}
+      const prev=clean[i-1],next=clean[i+1];
+      const d1=routeMeters(prev,cur),d2=routeMeters(cur,next),base=routeMeters(prev,next);
+      const windowS=Math.max(1,(dateMs(next.recordedAt)-dateMs(prev.recordedAt))/1000);
+      const outAndBack=d1>45&&d2>45&&base<22&&windowS<=90;
+      if(!outAndBack)final.push(cur);
+    }
+    return final;
+  }
+  function selectedRoute(){return visualRouteFilter(rawSelectedRoute())}
   function orderPinsForRoute(){const s=routeSellerValue();return tracking.orderEvents.filter(o=>!s||o.sellerName===s).sort((a,b)=>dateMs(a.recordedAt)-dateMs(b.recordedAt))}
   function visitsForRoute(){const s=routeSellerValue();return tracking.visits.filter(v=>!s||v.sellerName===s).sort((a,b)=>dateMs(a.startedAt)-dateMs(b.startedAt))}
-  function routeDistance(points){const s=routeSellerValue(),shifts=tracking.shifts.filter(x=>!s||x.sellerName===s);if(shifts.length)return sum(shifts,x=>x.distanceM)/1000;let km=0;for(let i=1;i<points.length;i++){const a=points[i-1],b=points[i];if(a.accuracy>250||b.accuracy>250)continue;const d=haversine(a,b);if(d<5)km+=d}return km}
+  function routeDistance(points){const s=routeSellerValue(),shifts=tracking.shifts.filter(x=>!s||x.sellerName===s);if(shifts.length)return sum(shifts,x=>x.distanceM)/1000;let km=0;for(let i=1;i<points.length;i++){const a=points[i-1],b=points[i];if(a.accuracy>80||b.accuracy>80)continue;const d=haversine(a,b);if(d<2)km+=d}return km}
   function fillRouteSelectors(){const date=$id('routeDate'),seller=$id('routeSeller');if(!date||!seller)return;if(!date.value)date.value=localTrackingDate();const keep=seller.value;const sellers=uniq([...data.accesses.map(x=>x.vendedor),...data.state.map(x=>x.vendedor),...tracking.livePositions.map(x=>x.sellerName),...tracking.shifts.map(x=>x.sellerName)].filter(Boolean));seller.innerHTML='<option value="">Todos os vendedores</option>'+sellers.map(x=>`<option>${esc(x)}</option>`).join('');if(sellers.includes(keep))seller.value=keep}
   function renderVisits(){
-    fillRouteSelectors();const points=selectedRoute(),orders=orderPinsForRoute(),visits=visitsForRoute(),km=routeDistance(points),live=tracking.livePositions,stale=live.filter(v=>v.liveStatus==='STALE'||v.staleSeconds>300),seller=routeSellerValue(),shifts=tracking.shifts.filter(x=>!seller||x.sellerName===seller);
+    fillRouteSelectors();const rawPoints=rawSelectedRoute(),points=selectedRoute(),orders=orderPinsForRoute(),visits=visitsForRoute(),km=routeDistance(points),live=tracking.livePositions,stale=live.filter(v=>v.liveStatus==='STALE'||v.staleSeconds>300),seller=routeSellerValue(),shifts=tracking.shifts.filter(x=>!seller||x.sellerName===seller);
     $id('vActive').textContent=live.filter(x=>x.liveStatus==='LIVE').length;$id('vInside').textContent=visits.length;$id('vOutside').textContent=`${km.toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})} km`;$id('vStale').textContent=stale.length;
     const first=points[0],last=points[points.length-1],mock=sum(shifts,x=>x.mockPoints),rejected=sum(shifts,x=>x.rejectedPoints);
-    $id('routeSummary').innerHTML=shifts.length||points.length||visits.length?`<article class="route-summary-card"><div><span>Vendedor</span><strong>${esc(seller||'Equipe')}</strong></div><div><span>Início</span><strong>${first?dateFmt(first.recordedAt):shifts[0]?dateFmt(shifts[0].startedAt):'—'}</strong></div><div><span>Último ponto</span><strong>${last?ago(last.recordedAt):(seller?'—':'Selecione um vendedor')}</strong></div><div><span>Pontos da rota</span><strong>${seller?fmt(points.length):'—'}</strong></div><div><span>Distância estimada</span><strong>${km.toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})} km</strong></div><div><span>Visitas</span><strong>${fmt(visits.length)}</strong></div><div><span>Pedidos</span><strong>${fmt(orders.length)}</strong></div><div><span>GPS descartados</span><strong>${fmt(rejected)}</strong></div><div><span>Localização simulada</span><strong>${fmt(mock)}</strong></div></article>`:`<div class="empty-route">Ainda não há expediente registrado para este filtro.</div>`;
+    $id('routeSummary').innerHTML=shifts.length||points.length||visits.length?`<article class="route-summary-card"><div><span>Vendedor</span><strong>${esc(seller||'Equipe')}</strong></div><div><span>Início</span><strong>${first?dateFmt(first.recordedAt):shifts[0]?dateFmt(shifts[0].startedAt):'—'}</strong></div><div><span>Último movimento</span><strong>${last?ago(last.recordedAt):(seller?'—':'Selecione um vendedor')}</strong></div><div><span>Pontos úteis da rota</span><strong>${seller?`${fmt(points.length)} / ${fmt(rawPoints.length)}`:'—'}</strong></div><div><span>Distância estimada</span><strong>${km.toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})} km</strong></div><div><span>Visitas</span><strong>${fmt(visits.length)}</strong></div><div><span>Pedidos</span><strong>${fmt(orders.length)}</strong></div><div><span>GPS descartados</span><strong>${fmt(rejected)}</strong></div><div><span>Localização simulada</span><strong>${fmt(mock)}</strong></div></article>`:`<div class="empty-route">Ainda não há expediente registrado para este filtro.</div>`;
     const recent=[...visits.map(v=>({type:'visit',at:v.startedAt,obj:v})),...orders.map(o=>({type:'order',at:o.recordedAt,obj:o}))].sort((a,b)=>dateMs(b.at)-dateMs(a.at)).slice(0,12);
     const liveCards=live.filter(v=>!seller||v.sellerName===seller).map(v=>`<article class="visit-card"><div class="metric-head"><h3>${esc(v.sellerName)}</h3><span class="status-pill ${v.liveStatus==='LIVE'?'good':'warn'}">${esc(v.liveStatus||'—')}</span></div><p>Expediente: ${dateFmt(v.startedAt)}<br>Último sinal: ${v.lastPointAt?ago(v.lastPointAt):'sem GPS'}</p><div class="visit-bottom"><b>${(v.distanceM/1000).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})} km hoje</b><span>${v.accuracy?`precisão ${fmt(v.accuracy)} m`:''}</span></div></article>`);
     const activity=recent.map(x=>x.type==='visit'?`<article class="visit-card auto"><div class="metric-head"><h3>${esc(x.obj.storeName||'Loja')}</h3><span class="status-pill ${x.obj.status==='ACTIVE'?'good':''}">${x.obj.status==='ACTIVE'?'EM VISITA':'VISITA'}</span></div><p>${esc(x.obj.sellerName)} · chegada ${dateFmt(x.obj.startedAt)}<br>${x.obj.endedAt?`saída ${dateFmt(x.obj.endedAt)} · ${Math.max(1,Math.round(x.obj.durationS/60))} min`:'permanência em andamento'}</p></article>`:`<article class="visit-card order"><div class="metric-head"><h3>Pedido · ${esc(x.obj.storeName||'Loja')}</h3><span class="status-pill good">${fmt(x.obj.totalUnits)} un.</span></div><p>${esc(x.obj.sellerName)} · ${dateFmt(x.obj.recordedAt)}<br>${x.obj.distanceToStoreM?`${fmt(x.obj.distanceToStoreM)} m da loja`:esc(x.obj.gpsStatus||'GPS registrado')}</p></article>`);
     $id('liveVisits').innerHTML=[...liveCards,...activity].join('')||'<div class="panel" style="padding:18px">Nenhuma atividade para este filtro.</div>';
-    const slider=$id('routeSlider');slider.max=Math.max(0,points.length-1);slider.value=Math.max(0,points.length-1);slider.disabled=points.length<2;$id('routeTime').textContent=last?dateFmt(last.recordedAt):'—';$id('routeCursorInfo').textContent=seller?(points.length?`${points.length} pontos GPS · use o controle para percorrer o dia`:'Ainda não há pontos de rota para este vendedor.'):'Selecione um vendedor para carregar e reproduzir o trajeto completo.';renderMap(points,orders,visits,live,Number(slider.value)||0)
+    const slider=$id('routeSlider');slider.max=Math.max(0,points.length-1);slider.value=Math.max(0,points.length-1);slider.disabled=points.length<2;$id('routeTime').textContent=last?dateFmt(last.recordedAt):'—';$id('routeCursorInfo').textContent=seller?(points.length?`${points.length} pontos úteis de ${rawPoints.length} recebidos · ruído e saltos são removidos do replay`:'Ainda não há movimento válido para este vendedor.'):'Selecione um vendedor para carregar e reproduzir o trajeto completo.';renderMap(points,orders,visits,live,Number(slider.value)||0)
   }
   function renderMap(points,orders,visits,live,cursor){
     if(!window.L)return;const stores=data.stores.filter(s=>s.lat&&s.lon),liveFiltered=live.filter(v=>v.lat&&v.lon),visitCoords=visits.flatMap(v=>[[v.startLat,v.startLon],[v.endLat,v.endLon]].filter(a=>a[0]&&a[1])),all=[...stores.map(s=>[s.lat,s.lon]),...points.map(p=>[p.lat,p.lon]),...orders.filter(o=>o.lat&&o.lon).map(o=>[o.lat,o.lon]),...visitCoords,...liveFiltered.map(v=>[v.lat,v.lon])];$id('mapEmpty').classList.toggle('hidden',all.length>0);if(!all.length)return;
     if(!map){map=L.map('map',{zoomControl:true}).setView(all[0],12);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);mapLayer=L.layerGroup().addTo(map)}mapLayer.clearLayers();playMarker=null;
     for(const st of stores)L.circle([st.lat,st.lon],{radius:st.raio||300,color:'#2563eb',weight:1,fillOpacity:.04}).addTo(mapLayer).bindPopup(`<b>${esc(st.loja)}</b><br>${esc(st.endereco||'')}`);
-    if(points.length){L.polyline(points.map(p=>[p.lat,p.lon]),{color:'#2563eb',weight:5,opacity:.82}).addTo(mapLayer);L.circleMarker([points[0].lat,points[0].lon],{radius:7,color:'#067647',fillColor:'#12b76a',fillOpacity:1}).addTo(mapLayer).bindPopup('<b>Início da rota</b>');const p=points[Math.min(cursor,points.length-1)];playMarker=L.circleMarker([p.lat,p.lon],{radius:9,color:'#fff',weight:3,fillColor:'#101828',fillOpacity:1}).addTo(mapLayer).bindPopup(`${esc(p.sellerName)}<br>${dateFmt(p.recordedAt)}<br>${esc(p.event||'GPS')}`)}
+    if(points.length){L.polyline(points.map(p=>[p.lat,p.lon]),{color:'#2563eb',weight:4,opacity:.86,smoothFactor:1.5,noClip:false}).addTo(mapLayer);L.circleMarker([points[0].lat,points[0].lon],{radius:7,color:'#067647',fillColor:'#12b76a',fillOpacity:1}).addTo(mapLayer).bindPopup('<b>Início da rota</b>');const p=points[Math.min(cursor,points.length-1)];playMarker=L.circleMarker([p.lat,p.lon],{radius:9,color:'#fff',weight:3,fillColor:'#101828',fillOpacity:1}).addTo(mapLayer).bindPopup(`${esc(p.sellerName)}<br>${dateFmt(p.recordedAt)}<br>${esc(p.event||'GPS')}`)}
     for(const v of visits){if(v.startLat&&v.startLon){const icon=L.divIcon({className:'',html:'<div class="auto-visit-map-pin">L</div>',iconSize:[24,24],iconAnchor:[12,12]});L.marker([v.startLat,v.startLon],{icon}).addTo(mapLayer).bindPopup(`<b>Chegada · ${esc(v.storeName||'Loja')}</b><br>${esc(v.sellerName)}<br>${dateFmt(v.startedAt)}${v.auto?'<br>Detectada pelo GPS':''}`)}if(v.endLat&&v.endLon){const icon=L.divIcon({className:'',html:'<div class="auto-exit-map-pin">S</div>',iconSize:[20,20],iconAnchor:[10,10]});L.marker([v.endLat,v.endLon],{icon}).addTo(mapLayer).bindPopup(`<b>Saída · ${esc(v.storeName||'Loja')}</b><br>${dateFmt(v.endedAt)}<br>${Math.max(1,Math.round(v.durationS/60))} min`)}}
     for(const o of orders){if(!o.lat||!o.lon)continue;const icon=L.divIcon({className:'',html:'<div class="order-map-pin">P</div>',iconSize:[28,28],iconAnchor:[14,14]});L.marker([o.lat,o.lon],{icon}).addTo(mapLayer).bindPopup(`<b>Pedido confirmado</b><br>${esc(o.sellerName)} · ${esc(o.storeName||'Loja')}<br>${dateFmt(o.recordedAt)}<br>${fmt(o.totalUnits)} unidades${o.distanceToStoreM?`<br>${fmt(o.distanceToStoreM)} m da loja`:''}`)}
     for(const v of liveFiltered){const cls=v.liveStatus==='LIVE'?'live-map-pin':'stale-map-pin',icon=L.divIcon({className:'',html:`<div class="${cls}">●</div>`,iconSize:[30,30],iconAnchor:[15,15]});L.marker([v.lat,v.lon],{icon}).addTo(mapLayer).bindPopup(`<b>${esc(v.sellerName)}</b><br>${v.liveStatus==='LIVE'?'AO VIVO':'SEM SINAL RECENTE'}<br>Último GPS: ${ago(v.lastPointAt)}<br>${(v.distanceM/1000).toFixed(1).replace('.',',')} km no expediente`)}
