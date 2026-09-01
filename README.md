@@ -1,17 +1,7 @@
-# Dashboard do gestor — V5.1 FR
+# Dashboard Gestor V6 — Supabase GPS
 
-Dashboard completo com atualização automática, alertas, vendedores, lojas, produtos, GPS, histórico, relatório e administração.
-
-Nesta versão os 5 produtos exibem foto real do catálogo, nome oficial, peso, código interno, valor unitário de tabela e quantidade por caixa.
-
-## Base financeira
-O sistema separa:
-- `Custo Unitário`: custo real, se a empresa informar;
-- `Valor Unitário Tabela`: valor da tabela FR de 26/06/2026.
-
-Se o custo real estiver zerado, o dashboard usa o valor de tabela somente como **estimativa gerencial** e deixa isso explícito na tela.
-
-## Publicação
-Substitua todos os arquivos do repositório do dashboard por esta pasta, inclusive `assets/products`.
-
-O webhook permanece `/webhook/reposicao-gestor`.
+- Estoque/pedidos continuam vindo do webhook `reposicao-gestor`.
+- A tela **Rotas e visitas** consulta `reposicao-v6-tracking-manager` a cada 10 segundos.
+- Com "Todos os vendedores", mostra posições ao vivo, pedidos e resumo.
+- Selecione um vendedor para carregar a rota detalhada daquele dia e usar Reproduzir.
+- A service_role do Supabase não fica no navegador. Tudo passa pelo n8n.
