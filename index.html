@@ -68,7 +68,7 @@
     </aside>
 
     <main class="main">
-      <header class="topbar"><button id="menuBtn" class="menu-btn">☰</button><div><p>GESTÃO COMERCIAL · ESTOQUE · VALIDADE · VISITAS</p><h1 id="pageTitle">Operação de hoje</h1></div><div class="top-actions"><span class="manager-version">v7.2</span><span id="liveBadge" class="live"><i></i><span>DEMO</span></span><button id="refreshBtn" class="icon-btn">↻</button></div></header>
+      <header class="topbar"><button id="menuBtn" class="menu-btn">☰</button><div><p>GESTÃO COMERCIAL · ESTOQUE · VALIDADE · VISITAS</p><h1 id="pageTitle">Operação de hoje</h1></div><div class="top-actions"><span class="manager-version">v7.3</span><span id="liveBadge" class="live"><i></i><span>DEMO</span></span><button id="refreshBtn" class="icon-btn">↻</button></div></header>
 
       <section class="filters panel">
         <label>Período<select id="periodFilter"><option value="7">Últimos 7 dias</option><option value="30" selected>Últimos 30 dias</option><option value="90">Últimos 90 dias</option><option value="all">Todo histórico</option></select></label>
@@ -135,7 +135,7 @@
       <section id="view-stores" class="view"><div class="page-intro"><p>LOJAS</p><h2>Desempenho por loja</h2><span>Compare pedido, trocas, validade, última visita e situação GPS.</span></div><div id="storeCards" class="cards-grid"></div></section>
       <section id="view-products" class="view"><div class="page-intro"><p>PRODUTOS</p><h2>Desempenho por produto</h2><span>Identifique onde cada produto gera excesso, troca ou risco financeiro.</span></div><div id="productCards" class="cards-grid"></div></section>
 
-      <section id="view-visits" class="view"><div class="page-intro"><p>ROTAS E VISITAS</p><h2>Acompanhamento do trabalho externo</h2><span>Veja o trajeto, as chegadas e saídas detectadas automaticamente e os pontos onde pedidos foram confirmados.</span></div><div class="route-toolbar panel"><label>Data<input id="routeDate" type="date"></label><label>Vendedor<select id="routeSeller"></select></label><button id="routePlay" class="primary small" type="button">▶ REPRODUZIR</button><div class="route-time"><span>Posição selecionada</span><strong id="routeTime">—</strong></div></div><div class="gps-summary v7"><article class="mini-kpi"><span>Vendedores ao vivo</span><strong id="vActive">0</strong></article><article class="mini-kpi"><span>Visitas detectadas</span><strong id="vInside">0</strong></article><article class="mini-kpi"><span>Distância estimada</span><strong id="vOutside">0 km</strong></article><article class="mini-kpi"><span>Sem sinal há +5 min</span><strong id="vStale">0</strong></article></div><div class="route-layout"><div class="panel map-panel route-map-panel"><div id="map"></div><div id="mapEmpty" class="map-empty">Ainda não há coordenadas para este filtro.</div><div class="route-player"><input id="routeSlider" type="range" min="0" max="0" value="0"><div id="routeCursorInfo" class="route-cursor-info">Selecione um vendedor para reproduzir o trajeto.</div></div></div><div><div id="routeSummary"></div><h3 class="route-side-title">Atividade recente</h3><div id="liveVisits" class="live-visits"></div></div></div><p class="privacy-callout">O rastreamento é iniciado pelo próprio vendedor durante o expediente. O mapa aplica filtro visual contra deriva e saltos de GPS: os pontos continuam registrados no sistema, mas leituras incompatíveis não entram no traçado nem no replay.</p></section>
+      <section id="view-visits" class="view"><div class="page-intro"><p>ROTAS E VISITAS</p><h2>Acompanhamento do trabalho externo</h2><span>Veja o trajeto, as chegadas e saídas detectadas automaticamente e os pontos onde pedidos foram confirmados.</span></div><div class="route-toolbar panel"><label>Data<input id="routeDate" type="date"></label><label>Vendedor<select id="routeSeller"></select></label><button id="routePlay" class="primary small" type="button">▶ REPRODUZIR</button><div class="route-time"><span>Posição selecionada</span><strong id="routeTime">—</strong></div></div><div class="gps-summary v7"><article class="mini-kpi"><span>Vendedores ao vivo</span><strong id="vActive">0</strong></article><article class="mini-kpi"><span>Visitas detectadas</span><strong id="vInside">0</strong></article><article class="mini-kpi"><span>Distância estimada</span><strong id="vOutside">0 km</strong></article><article class="mini-kpi"><span>Sem sinal há +5 min</span><strong id="vStale">0</strong></article></div><div class="route-layout"><div class="panel map-panel route-map-panel"><div id="map"></div><div id="mapEmpty" class="map-empty">Ainda não há coordenadas para este filtro.</div><div class="route-player"><input id="routeSlider" type="range" min="0" max="0" value="0"><div id="routeCursorInfo" class="route-cursor-info">Selecione um vendedor para reproduzir o trajeto.</div></div></div><div><div id="routeSummary"></div><h3 class="route-side-title">Atividade recente</h3><div id="liveVisits" class="live-visits"></div></div></div><p class="privacy-callout">O mapa usa o Supabase para as rotas atuais e consulta automaticamente o histórico V5.2 da planilha para datas anteriores. A posição ao vivo de hoje nunca é misturada com um dia histórico.</p></section>
 
       <section id="view-history" class="view"><div class="page-intro row"><div><p>HISTÓRICO</p><h2>Movimentações registradas</h2><span>Auditoria completa: contagem, recomendação, pedido, motivo, validade, GPS e faturamento.</span></div><button id="exportHistory" class="secondary">Exportar CSV</button></div><div class="panel table-wrap"><table><thead><tr><th>Data</th><th>Vendedor</th><th>Loja</th><th>Produto</th><th>Estoque</th><th>Sugerido</th><th>Pedido</th><th>Excesso</th><th>Trocas</th><th>Validade</th><th>Motivo</th><th>GPS</th><th>Faturado</th></tr></thead><tbody id="historyBody"></tbody></table></div></section>
 
@@ -186,6 +186,7 @@
   const cfg=()=>({url:localStorage.getItem('reposicao_v5_manager_url')||localStorage.getItem('reposicao_v4_manager_url')||'',key:localStorage.getItem('reposicao_v5_manager_key')||localStorage.getItem('reposicao_v4_manager_key')||''});
   const adminEndpoint=kind=>{const c=cfg();if(!c.url)return '';try{const u=new URL(c.url);u.pathname=u.pathname.replace(/\/+$/,'').replace(/reposicao-gestor$/,`reposicao-admin-${kind}`);return u.toString()}catch{return c.url.replace(/reposicao-gestor$/,`reposicao-admin-${kind}`)}};
   const trackingEndpoint=()=>{const c=cfg();if(!c.url)return '';try{const u=new URL(c.url);u.pathname=u.pathname.replace(/\/+$/,'').replace(/reposicao-gestor$/,'reposicao-v6-tracking-manager');return u.toString()}catch{return c.url.replace(/reposicao-gestor$/,'reposicao-v6-tracking-manager')}};
+  const legacyRouteEndpoint=()=>{const c=cfg();if(!c.url)return '';try{const u=new URL(c.url);u.pathname=u.pathname.replace(/\/+$/,'').replace(/reposicao-gestor$/,'reposicao-v7-legacy-route');return u.toString()}catch{return c.url.replace(/reposicao-gestor$/,'reposicao-v7-legacy-route')}};
   function normalizeTracking(raw){
     const arr=v=>Array.isArray(v)?v:[];
     const executive=raw.executive&&typeof raw.executive==='object'?raw.executive:{};
@@ -201,6 +202,29 @@
       alerts:arr(raw.alerts),operationalAlerts:arr(raw.operationalAlerts)
     };
   }
+  function normalizeLegacyRoute(raw){
+    const arr=Array.isArray(raw?.routePoints)?raw.routePoints:[];
+    return arr.map(r=>({
+      id:r.id,shiftId:clean(r.shiftId),recordedAt:iso(r.recordedAt),receivedAt:iso(r.receivedAt||r.recordedAt),
+      sellerCode:clean(r.sellerCode),sellerName:clean(r.sellerName),lat:num(r.latitude),lon:num(r.longitude),
+      accuracy:num(r.accuracyM),speed:num(r.speedMps),bearing:num(r.bearingDeg),simulated:Boolean(r.simulated),
+      source:clean(r.source||'LEGACY_V5_2'),storeName:clean(r.storeName),visitId:clean(r.visitId),event:clean(r.event||'MOVEMENT'),
+      distanceToStoreM:num(r.distanceToStoreM),geofenceStatus:clean(r.geofenceStatus),deltaDistanceM:num(r.deltaDistanceM),accepted:r.accepted!==false
+    })).filter(r=>r.sellerName&&r.lat&&r.lon&&r.recordedAt);
+  }
+  async function loadLegacyRoute(date,seller,silent=true){
+    const c=cfg(),url=legacyRouteEndpoint();if(!url||!date)return [];
+    const ctl=new AbortController(),tm=setTimeout(()=>ctl.abort(),12000);
+    try{
+      const q=new URLSearchParams({chave:c.key,data:date,vendedor:seller||'',_ts:String(Date.now())});
+      const res=await fetch(`${url}?${q}`,{headers:{Accept:'application/json'},cache:'no-store',signal:ctl.signal});
+      const txt=await res.text();if(!txt.trim())return [];
+      let raw;try{raw=JSON.parse(txt)}catch{return []}
+      if(!res.ok||raw.ok===false){if(!silent)toast(raw.error||`Histórico legado HTTP ${res.status}`);return []}
+      return normalizeLegacyRoute(raw);
+    }catch(e){if(!silent)toast(`Histórico legado: ${e.name==='AbortError'?'tempo limite':e.message}`);return []}
+    finally{clearTimeout(tm)}
+  }
   async function loadTracking(silent=false){
     const c=cfg(),url=trackingEndpoint();if(!url||data.demo)return false;if(trackingLoading)return false;trackingLoading=true;
     const ctl=new AbortController(),tm=setTimeout(()=>ctl.abort(),12000);
@@ -209,7 +233,21 @@
       const q=new URLSearchParams({chave:c.key,data:date,vendedor:seller,_ts:String(Date.now())});
       const res=await fetch(`${url}?${q}`,{headers:{Accept:'application/json'},cache:'no-store',signal:ctl.signal}),txt=await res.text();
       if(!txt.trim())throw new Error(`Rastreamento sem resposta (HTTP ${res.status}).`);let raw;try{raw=JSON.parse(txt)}catch{throw new Error('Resposta inválida do rastreamento.')}if(!res.ok||raw.ok===false)throw new Error(raw.error||`HTTP ${res.status}`);
-      tracking=normalizeTracking(raw);lastTrackingLoad=Date.now();renderToday();renderVisits();renderAlerts();return true;
+      tracking=normalizeTracking(raw);
+      const historical=date<localTrackingDate();
+      if(historical){
+        // Nunca mistura a posição AO VIVO de hoje com uma data passada.
+        tracking.livePositions=[];
+        const legacy=await loadLegacyRoute(date,seller,true);
+        if(legacy.length){
+          const merged=[...tracking.routePoints,...legacy],seen=new Set();
+          tracking.routePoints=merged.filter(p=>{
+            const k=`${p.sellerName}|${p.recordedAt}|${Number(p.lat).toFixed(5)}|${Number(p.lon).toFixed(5)}`;
+            if(seen.has(k))return false;seen.add(k);return true;
+          }).sort((a,b)=>dateMs(a.recordedAt)-dateMs(b.recordedAt));
+        }
+      }
+      lastTrackingLoad=Date.now();renderToday();renderVisits();renderAlerts();return true;
     }catch(e){if(!silent)toast(`GPS: ${e.name==='AbortError'?'tempo limite':e.message}`);return false}finally{clearTimeout(tm);trackingLoading=false}
   }
   function restartTrackingTimer(){if(trackingTimer)clearInterval(trackingTimer);if(!cfg().url||data.demo)return;trackingTimer=setInterval(()=>{if(!document.hidden)loadTracking(true)},10000)}
@@ -357,7 +395,7 @@
     const liveCards=live.filter(v=>!seller||v.sellerName===seller).map(v=>`<article class="visit-card"><div class="metric-head"><h3>${esc(v.sellerName)}</h3><span class="status-pill ${v.liveStatus==='LIVE'?'good':'warn'}">${esc(v.liveStatus||'—')}</span></div><p>Expediente: ${dateFmt(v.startedAt)}<br>Último sinal: ${v.lastPointAt?ago(v.lastPointAt):'sem GPS'}</p><div class="visit-bottom"><b>${(v.distanceM/1000).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})} km hoje</b><span>${v.accuracy?`precisão ${fmt(v.accuracy)} m`:''}</span></div></article>`);
     const activity=recent.map(x=>x.type==='visit'?`<article class="visit-card auto"><div class="metric-head"><h3>${esc(x.obj.storeName||'Loja')}</h3><span class="status-pill ${x.obj.status==='ACTIVE'?'good':''}">${x.obj.status==='ACTIVE'?'EM VISITA':'VISITA'}</span></div><p>${esc(x.obj.sellerName)} · chegada ${dateFmt(x.obj.startedAt)}<br>${x.obj.endedAt?`saída ${dateFmt(x.obj.endedAt)} · ${Math.max(1,Math.round(x.obj.durationS/60))} min`:'permanência em andamento'}</p></article>`:`<article class="visit-card order"><div class="metric-head"><h3>Pedido · ${esc(x.obj.storeName||'Loja')}</h3><span class="status-pill good">${fmt(x.obj.totalUnits)} un.</span></div><p>${esc(x.obj.sellerName)} · ${dateFmt(x.obj.recordedAt)}<br>${x.obj.distanceToStoreM?`${fmt(x.obj.distanceToStoreM)} m da loja`:esc(x.obj.gpsStatus||'GPS registrado')}</p></article>`);
     $id('liveVisits').innerHTML=[...liveCards,...activity].join('')||'<div class="panel" style="padding:18px">Nenhuma atividade para este filtro.</div>';
-    const slider=$id('routeSlider');slider.max=Math.max(0,points.length-1);slider.value=Math.max(0,points.length-1);slider.disabled=points.length<2;$id('routeTime').textContent=last?dateFmt(last.recordedAt):'—';$id('routeCursorInfo').textContent=seller?(points.length?`${points.length} pontos úteis de ${rawPoints.length} recebidos · ruído e saltos são removidos do replay`:'Ainda não há movimento válido para este vendedor.'):'Selecione um vendedor para carregar e reproduzir o trajeto completo.';renderMap(points,orders,visits,live,Number(slider.value)||0)
+    const slider=$id('routeSlider');slider.max=Math.max(0,points.length-1);slider.value=Math.max(0,points.length-1);slider.disabled=points.length<2;$id('routeTime').textContent=last?dateFmt(last.recordedAt):'—';$id('routeCursorInfo').textContent=seller?(points.length?`${points.length} pontos úteis de ${rawPoints.length} recebidos · ruído e saltos são removidos do replay`:(routeDateValue()<localTrackingDate()?'Não há pontos GPS no Supabase nem no histórico V5.2 para esta data.':'Ainda não há movimento válido para este vendedor.')):'Selecione um vendedor para carregar e reproduzir o trajeto completo.';renderMap(points,orders,visits,live,Number(slider.value)||0)
   }
   function renderMap(points,orders,visits,live,cursor){
     if(!window.L)return;const stores=data.stores.filter(s=>s.lat&&s.lon),liveFiltered=live.filter(v=>v.lat&&v.lon),visitCoords=visits.flatMap(v=>[[v.startLat,v.startLon],[v.endLat,v.endLon]].filter(a=>a[0]&&a[1])),all=[...stores.map(s=>[s.lat,s.lon]),...points.map(p=>[p.lat,p.lon]),...orders.filter(o=>o.lat&&o.lon).map(o=>[o.lat,o.lon]),...visitCoords,...liveFiltered.map(v=>[v.lat,v.lon])];$id('mapEmpty').classList.toggle('hidden',all.length>0);if(!all.length)return;
@@ -369,7 +407,7 @@
     for(const v of liveFiltered){const cls=v.liveStatus==='LIVE'?'live-map-pin':'stale-map-pin',icon=L.divIcon({className:'',html:`<div class="${cls}">●</div>`,iconSize:[30,30],iconAnchor:[15,15]});L.marker([v.lat,v.lon],{icon}).addTo(mapLayer).bindPopup(`<b>${esc(v.sellerName)}</b><br>${v.liveStatus==='LIVE'?'AO VIVO':'SEM SINAL RECENTE'}<br>Último GPS: ${ago(v.lastPointAt)}<br>${(v.distanceM/1000).toFixed(1).replace('.',',')} km no expediente`)}
     map.fitBounds(all,{padding:[30,30],maxZoom:16});setTimeout(()=>map.invalidateSize(),50)
   }
-  function routeSeek(){const pts=selectedRoute(),i=Number($id('routeSlider').value)||0,p=pts[i];if(p)$id('routeTime').textContent=dateFmt(p.recordedAt);renderMap(pts,orderPinsForRoute(),visitsForRoute(),tracking.livePositions,i)}
+  function routeSeek(){const pts=selectedRoute(),i=Number($id('routeSlider').value)||0,p=pts[i];if(p)$id('routeTime').textContent=dateFmt(p.recordedAt);const live=routeDateValue()===localTrackingDate()?tracking.livePositions:[];renderMap(pts,orderPinsForRoute(),visitsForRoute(),live,i)}
   function routePlay(){const btn=$id('routePlay'),pts=selectedRoute();if(pts.length<2)return;if(playTimer){clearInterval(playTimer);playTimer=null;btn.textContent='▶ REPRODUZIR';return}let i=Number($id('routeSlider').value)||0;if(i>=pts.length-1)i=0;$id('routeSlider').value=i;btn.textContent='❚❚ PAUSAR';playTimer=setInterval(()=>{i++;if(i>=pts.length){clearInterval(playTimer);playTimer=null;btn.textContent='▶ REPRODUZIR';return}$id('routeSlider').value=i;routeSeek()},500)}
   function renderReport(){const rows=filteredHistory(),m=metrics(rows),a=alerts(rows),start=els.period.options[els.period.selectedIndex].text;const best=aggregate(rows,'vendedor').sort((a,b)=>b.adherence-a.adherence)[0],worst=aggregate(rows,'cliente').sort((a,b)=>b.excess-a.excess)[0],hasFinancial=data.products.some(p=>(p.custo||p.tablePrice)>0),basis=financeBasis();const text=`REPOSIÇÃO INTELIGENTE — ${start}
 
