@@ -1,12 +1,36 @@
-# Dashboard Gestor V7 — Operação Inteligente
+# Dashboard Operacional — Ambiente de Desenvolvimento
 
-Esta versão acrescenta a tela **Hoje**, visitas automáticas por geofence, cobertura de lojas atribuídas, alertas operacionais e replay de rota com marcadores de chegada/saída/pedido.
+Repositório de desenvolvimento utilizado para testar uma interface de gestão de operação em campo.
 
-## Instalação
-1. Execute primeiro `SQL_SUPABASE_V7_OPERACAO_INTELIGENTE.sql` no Supabase.
-2. Substitua o dashboard atual por este `index.html`.
-3. Mantenha o workflow n8n V6.2 ativo: as assinaturas das RPCs foram preservadas.
-4. Mantenha o APK V3/6.0.2: ele já envia o GPS necessário para a V7.
+O projeto trabalha com acompanhamento de visitas, cobertura de lojas, alertas e visualização de rota.
 
-## Geofence automático
-A entrada exige 2 pontos GPS válidos consecutivos dentro do raio da loja. A saída exige 2 pontos consecutivos além do raio de saída (raio + 80 m ou +25%). Isso reduz visitas falsas causadas por oscilação do GPS.
+> **Status:** ambiente experimental. A versão de portfólio relacionada está em [Reposição Inteligente](https://github.com/gabrieelwilliam-source/reposicao-inteligente-app).
+
+## Recursos testados
+
+- dashboard operacional;
+- acompanhamento de visitas;
+- geofence;
+- alertas;
+- cobertura de lojas;
+- replay de rota;
+- integração com dados operacionais.
+
+## Tecnologias
+
+- HTML
+- CSS
+- JavaScript
+- Supabase
+- n8n
+
+## Projeto recomendado para avaliação
+
+Para uma versão mais organizada e documentada deste tipo de solução:
+
+[Ver Reposição Inteligente →](https://github.com/gabrieelwilliam-source/reposicao-inteligente-app)
+
+## Portfólio de front-end
+
+- [Landing Page FR Distribuidora](https://github.com/gabrieelwilliam-source/landingpages)
+- [Zion Automações](https://github.com/gabrieelwilliam-source/Site-automacao)
